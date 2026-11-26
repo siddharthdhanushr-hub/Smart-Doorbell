@@ -3,10 +3,18 @@
   "team_name": "Paradise",
   "board_operator": "Siddharth Dhanush R (Student 1)",
   "target_board": "ESP32-S3-DevKitC-1 N16R8",
+  "chip_detected": {
+    "chip_type": "ESP32-S3 (QFN56) (revision v0.2)",
+    "cpu_mhz": 240,
+    "crystal_mhz": 40,
+    "mac": "a4:cb:8f:d4:74:98",
+    "flash_chip_bytes": 16777216,
+    "psram_detected_by_esptool": "8MB (AP_3v3)"
+  },
   "arduino_ide": {
     "esp32_core_package": "esp32 by Espressif Systems",
     "esp32_core_version_installed": "3.3.12",
-    "fqbn_base": "esp32:esp32:esp32s3",
+    "fqbn_phase1": "esp32:esp32:esp32s3:CDCOnBoot=cdc",
     "board_menu": "ESP32S3 Dev Module",
     "initial_settings": {
       "USB_CDC_On_Boot": "Enabled"
@@ -14,19 +22,39 @@
     "mission2_settings_to_verify": {
       "Flash_Size": "16MB (128Mb)",
       "PSRAM": "OPI PSRAM",
-      "Partition_Scheme": "TBD after checking fs_total via INFO"
+      "Partition_Scheme": "TBD in Mission 2 (default 4MB partition gives fs_total=1441792)"
     }
   },
   "usb_ports": {
     "usb_native_cdc": {
-      "port": "Not yet tested (connect USB-C cable to USB port)",
+      "port": "COM11",
+      "pnp_device_id": "USB\\VID_303A&PID_1001&MI_00\\7&C8A271C&0&0000",
+      "ping_verified": true,
+      "info_verified": true,
+      "basic_stream_verified": true,
       "baud_note": "Ignored by native USB CDC"
     },
     "com_uart_bridge": {
-      "port": "Not yet tested (connect USB-C cable to COM/UART port)",
+      "port": "COM12",
+      "pnp_device_id": "USB\\VID_1A86&PID_55D3\\5C37278289",
+      "ping_verified": true,
+      "info_verified": true,
+      "basic_stream_verified": true,
       "default_baud": 921600,
       "rx_buffer_bytes": 32768
     }
   },
-  "board_info_measured": "Not yet tested"
+  "board_info_measured": {
+    "cpu_mhz": 240,
+    "heap_free": 256208,
+    "heap_largest": 204788,
+    "psram_size": 0,
+    "psram_free": 0,
+    "psram_largest": 0,
+    "flash_chip": 16777216,
+    "fs_total": 1441792,
+    "fs_used": 8192,
+    "stored": 0,
+    "where": "none"
+  }
 }

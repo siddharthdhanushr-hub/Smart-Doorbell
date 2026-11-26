@@ -1,0 +1,25 @@
+{
+  "team_number": 1,
+  "source_of_truth": "edge_ai_assignment2/README.md (Section 5)",
+  "dataset_source": "edge_ai_assignment2/team_audio.py",
+  "num_classes": 6,
+  "classes": ["on", "off", "stop", "go", "_unknown", "_silence"],
+  "clips_per_class": 24,
+  "total_clips": 144,
+  "clip_duration_s": 1.0,
+  "channels": 1,
+  "mic_native_fs_hz": 48000,
+  "allowed_fs_hz": [48000, 24000, 16000, 12000, 8000, 6000, 4000],
+  "default_fs_hz": 16000,
+  "default_antialias": true,
+  "byte_order": "little-endian",
+  "supported_formats": {
+    "f32": {"bits": 32, "bytes_per_sample": 4, "numpy_dtype": "<f4", "signed": true},
+    "i16": {"bits": 16, "bytes_per_sample": 2, "numpy_dtype": "<i2", "qmax": 32767, "qmin": -32768},
+    "i8":  {"bits": 8,  "bytes_per_sample": 1, "numpy_dtype": "int8", "qmax": 127,   "qmin": -128}
+  },
+  "quantisation_formula": {
+    "quantise": "q = clip(round(x / S * (2**(b-1) - 1)), -2**(b-1), 2**(b-1) - 1)",
+    "dequantise": "xhat = q * S / (2**(b-1) - 1)"
+  }
+}
