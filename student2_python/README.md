@@ -16,12 +16,13 @@ py -m pip install -r student2_python/requirements.txt
 - `transmission/batch_pipeline.py` — `transmit_clip()` and `transmit_batch()` reusable pipelines.
 - `logmel/reference_logmel.py` — Pure NumPy reference `features(x, fs, win, hop, nfft, mels, mfcc)` matching `features.h` within `<= 0.0001 dB`.
 
-## Running Tests & Exports (No Board Required)
+## Running Tests, Exports & Backend API (No Board Required)
 ```powershell
 py -m pytest -v student2_python/tests
 py student2_python/src/dataset_inspect.py --team 1 --fs 16000
 py student2_python/src/mission2_audio_analysis.py
 py student2_python/logmel/reference_logmel.py --team 1
+py student2_python/api/server.py --port 5000
 ```
 
 ## Known Limitations & Design Notes

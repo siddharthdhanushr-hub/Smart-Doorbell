@@ -3,7 +3,20 @@
   "team": 1,
   "team_name": "Paradise",
   "generated_by": "Student 1 & Student 2 (Siddharth Dhanush R)",
-  "note_for_student3": "All files below live in the repository and contain measured hardware/Python outputs (no live ESP32 connection required by the dashboard).",
+  "note_for_student3": "All files below live in the repository and contain measured hardware/Python outputs (no live ESP32 connection required by the dashboard). A lightweight Flask API wrapping these endpoints is also provided at student2_python/api/server.py.",
+  "flask_api": {
+    "command": "py student2_python/api/server.py --port 5000",
+    "endpoints": [
+      "GET /api/health",
+      "GET /api/configs",
+      "GET /api/dataset",
+      "GET /api/clips/<clip_id>?fs=16000&antialias=true",
+      "GET /api/benchmarks/mission1",
+      "GET /api/benchmarks/mission2",
+      "GET /api/benchmarks/mission3",
+      "GET /api/benchmarks/mission4_5"
+    ]
+  },
   "data_sources": {
     "hardware_config": "shared/hardware_config.json",
     "audio_config": "shared/audio_config.json",
