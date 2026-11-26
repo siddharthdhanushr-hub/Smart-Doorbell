@@ -31,7 +31,7 @@
       "pnp_device_id": "USB\\VID_303A&PID_1001&MI_00\\7&C8A271C&0&0000",
       "ping_verified": true,
       "info_verified": true,
-      "basic_stream_verified": false,
+      "basic_stream_verified": true,
       "baud_note": "Ignored by native USB CDC"
     },
     "com_uart_bridge": {

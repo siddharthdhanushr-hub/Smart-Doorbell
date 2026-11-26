@@ -210,23 +210,40 @@ def main() -> None:
     ap.add_argument("--com-port", default=None, help="UART bridge COM port (e.g. COM12)")
     ap.add_argument("--usb-port", default=None, help="Native USB CDC COM port (e.g. COM11)")
     ap.add_argument("--repeats", type=int, default=3)
+    ap.add_argument("--merge-existing", action="store_true", help="Keep prior rows for ports not run in this invocation")
     args = ap.parse_args()
 
     if not args.com_port and not args.usb_port:
         ap.error("Provide at least --com-port and/or --usb-port")
 
+    bench_dir = REPO_ROOT / "student1_esp32" / "benchmarks"
+    logs_dir = REPO_ROOT / "student1_esp32" / "logs"
+    bench_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = bench_dir / "mission1_throughput.csv"
+
     rows: List[Dict[str, Any]] = []
+    run_labels = set()
+    if args.com_port:
+        run_labels.add("COM")
+    if args.usb_port:
+        run_labels.add("USB")
+
+    if args.merge_existing and csv_path.exists():
+        with csv_path.open("r", newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if r["port_label"] not in run_labels:
+                    for int_k in ("baud", "repeat", "fs", "samples_per_packet", "bytes_sent", "packets_sent", "board_ms", "frames_ok", "bad_crc", "bad_len", "seq_gaps", "dup", "samples_rx", "uart_errors"):
+                        r[int_k] = int(r[int_k]) if r[int_k] not in ("", "None") else 0
+                    for flt_k in ("speed", "send_seconds", "throughput_laptop_bps", "throughput_board_bps", "effective_samples_per_s"):
+                        r[flt_k] = float(r[flt_k])
+                    rows.append(r)
+
     if args.com_port:
         benchmark_port("COM", args.com_port, [115200, 921600, 2000000], args.repeats, rows)
     if args.usb_port:
         benchmark_port("USB", args.usb_port, [115200, 921600, 2000000], args.repeats, rows)
 
-    bench_dir = REPO_ROOT / "student1_esp32" / "benchmarks"
-    logs_dir = REPO_ROOT / "student1_esp32" / "logs"
-    bench_dir.mkdir(parents=True, exist_ok=True)
-    logs_dir.mkdir(parents=True, exist_ok=True)
-
-    csv_path = bench_dir / "mission1_throughput.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
@@ -237,8 +254,8 @@ def main() -> None:
         json.dumps(
             {
                 "timestamp": datetime.now().isoformat(),
-                "com_port": args.com_port,
-                "usb_port": args.usb_port,
+                "com_port": args.com_port or next((r["port"] for r in rows if r["port_label"] == "COM"), None),
+                "usb_port": args.usb_port or next((r["port"] for r in rows if r["port_label"] == "USB"), None),
                 "repeats": args.repeats,
                 "runs": rows,
             },
