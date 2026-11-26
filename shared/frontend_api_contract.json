@@ -1,0 +1,48 @@
+{
+  "contract_version": "1.0.0",
+  "team": 1,
+  "team_name": "Paradise",
+  "generated_by": "Student 1 & Student 2 (Siddharth Dhanush R)",
+  "note_for_student3": "All files below live in the repository and contain measured hardware/Python outputs (no live ESP32 connection required by the dashboard).",
+  "data_sources": {
+    "hardware_config": "shared/hardware_config.json",
+    "audio_config": "shared/audio_config.json",
+    "logmel_config": "shared/logmel_config.json",
+    "communication_protocol": "shared/communication_protocol.json",
+    "dataset_manifest_csv": "dataset/dataset_manifest.csv",
+    "dataset_validation_json": "dataset/dataset_validation.json",
+    "dataset_features_npz": "dataset/doorbell_team1_esp32_features.npz",
+    "dataset_features_csv": "dataset/doorbell_team1_esp32_features.csv",
+    "data_card_md": "dataset/data_card.md",
+    "mission1_throughput_csv": "student1_esp32/benchmarks/mission1_throughput.csv",
+    "mission1_pipe_results_json": "student1_esp32/logs/mission1_pipe_results.json",
+    "mission2_probe_json": "student1_esp32/logs/mission2_probe_baseline.json",
+    "mission2_save144_json": "student1_esp32/logs/mission2_save144_opi_16m.json",
+    "mission2_verify_json": "student1_esp32/logs/mission2_verify_opi_16m.json",
+    "mission2_audio_analysis_json": "student2_python/documentation/mission2_audio_analysis.json",
+    "mission3_starter_json": "student1_esp32/logs/mission3_starter_10s.json",
+    "mission3_optimized_json": "student1_esp32/logs/mission3_optimized_results.json",
+    "mission4_skip_before_json": "student1_esp32/logs/mission4_skip_before_fix.json",
+    "mission4_skip_after_json": "student1_esp32/logs/mission4_skip_after_fix.json",
+    "phase5_144clips_all_runs_json": "student1_esp32/logs/phase5_144clips_all_runs.json"
+  },
+  "feature_arrays_for_student4": {
+    "esp32_16k_i16_S1.0_speed1": {
+      "raw_stream": "student1_esp32/feature_arrays/esp32_raw_16k_i16_S1.0_speed1.npz",
+      "per_clip": "student1_esp32/feature_arrays/esp32_clips_16k_i16_S1.0_speed1.npz",
+      "python_ref": "student2_python/feature_arrays/python_ref_clips_16k_i16_S1.0_speed1.npz"
+    },
+    "esp32_16k_i8_S1.0": {
+      "per_clip": "student1_esp32/feature_arrays/esp32_clips_16k_i8_S1.0.npz",
+      "python_ref": "student2_python/feature_arrays/python_ref_clips_16k_i8_S1.0.npz"
+    },
+    "esp32_16k_i8_S0.25": {
+      "per_clip": "student1_esp32/feature_arrays/esp32_clips_16k_i8_S0.25.npz",
+      "python_ref": "student2_python/feature_arrays/python_ref_clips_16k_i8_S0.25.npz"
+    },
+    "esp32_8k_i16_S1.0_noaa": {
+      "per_clip": "student1_esp32/feature_arrays/esp32_clips_8k_i16_S1.0_noaa.npz",
+      "python_ref": "student2_python/feature_arrays/python_ref_clips_8k_i16_S1.0_noaa.npz"
+    }
+  }
+}

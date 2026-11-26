@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-11-26T18:12:30.677934",
+  "tag": "before_fix",
+  "port": "COM11",
+  "seconds": 10,
+  "skip_packets": [
+    10,
+    11,
+    200
+  ],
+  "expected_total_packets": 500,
+  "packets_sent": 497,
+  "expected_features_no_loss": 499,
+  "received_features": 496,
+  "lost_features": 3,
+  "board": {
+    "why": "end",
+    "frames_ok": 498,
+    "bad_crc": 0,
+    "bad_len": 0,
+    "seq_gaps": 3,
+    "dup": 0,
+    "samples": 159040,
+    "stored": 318080,
+    "where": "psram",
+    "store_full": 0,
+    "features": 496,
+    "max_us": 737,
+    "avg_us": 684,
+    "uart_errors": 0,
+    "ms": 2499
+  },
+  "first_sample_after_gap1": [
+    3840,
+    4160,
+    4480
+  ],
+  "first_sample_after_gap2": [
+    64320,
+    64640,
+    64960
+  ],
+  "last_5_first_samples": [
+    157120,
+    157440,
+    157760,
+    158080,
+    158400
+  ],
+  "expected_last_first_sample": 159520,
+  "tail_shift_samples": -1120
+}

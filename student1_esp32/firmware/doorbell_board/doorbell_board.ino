@@ -51,6 +51,7 @@ static int fmtBytes = 2; static float qmaxInv = 1.0f / 32767.0f, scale = 1.0f;
 static char fmtName[4] = "i16";
 static bool featOn = true;
 static volatile uint32_t uartErrors = 0;
+static uint32_t pktSamples = 0, skipToHop = 0;
 
 static void sendFrame(Stream &s, char type, uint32_t seq, const uint8_t *payload, uint16_t len) {
   uint8_t hdr[9] = {0xB5, 0x5B, (uint8_t)type};
@@ -62,6 +63,7 @@ static void sendFrame(Stream &s, char type, uint32_t seq, const uint8_t *payload
 static void pushSamples(Stream &s, const uint8_t *p, size_t nbytes) {
   size_t n = nbytes / fmtBytes;
   for (size_t i = 0; i < n; i++) {
+    if (skipToHop > 0) { skipToHop--; continue; }
     float x;
     if (fmtBytes == 4) memcpy(&x, p + 4 * i, 4);
     else if (fmtBytes == 2) { int16_t q; memcpy(&q, p + 2 * i, 2); x = q * qmaxInv * scale; }
@@ -145,6 +147,7 @@ static void runStream(Stream &s, const char *line) {
     storeCap = want; strcpy(storeWhere, where);
   }
   memset(&st, 0, sizeof st); st.lastSeq = -1; uartErrors = 0;
+  pktSamples = 0; skipToHop = 0;
   s.printf("READY fs=%d fmt=%s win=%d hop=%d nfft=%d out=%d feat=%d store=%s cap=%u\n",
            c.fs, fmtName, c.win, c.hop, c.nfft, feat.outSize(), (int)featOn, storeWhere, (unsigned)storeCap);
 
@@ -176,10 +179,30 @@ static void runStream(Stream &s, const char *line) {
     char type = buf[2]; have = 0;
     if (crc32(buf + 2, 7 + len) != crc) { st.badCrc++; continue; }
     if ((int32_t)seq <= st.lastSeq) { st.dup++; continue; }
-    if (st.lastSeq >= 0 && (int32_t)seq != st.lastSeq + 1) st.seqGaps += seq - st.lastSeq - 1;
+    uint32_t gapPkts = 0;
+    if (st.lastSeq < 0 && seq > 0) gapPkts = seq;
+    else if (st.lastSeq >= 0 && (int32_t)seq != st.lastSeq + 1) gapPkts = seq - (uint32_t)st.lastSeq - 1;
+    st.seqGaps += gapPkts;
     st.lastSeq = seq; st.framesOk++; st.tLast = millis();
     if (type == 'E') { finishStream(s, "end"); return; }
     if (type != 'D') continue;
+    uint32_t n = len / fmtBytes;
+    if (pktSamples == 0 && n > 0) pktSamples = n;
+    if (gapPkts > 0) {
+      uint32_t lostSamples = gapPkts * (pktSamples ? pktSamples : n);
+      st.samples += lostSamples;
+      if (storeBuf) {
+        size_t needBytes = (size_t)lostSamples * fmtBytes;
+        size_t room = storeCap - storeLen, kz = needBytes < room ? needBytes : room;
+        if (kz) { memset(storeBuf + storeLen, 0, kz); storeLen += kz; }
+        if (kz < needBytes) st.storeFull++;
+      }
+      if (featOn) {
+        fcount = 0;
+        uint32_t rem = st.samples % (uint32_t)feat.c.hop;
+        skipToHop = rem ? ((uint32_t)feat.c.hop - rem) : 0;
+      }
+    }
     if (storeBuf) {
       size_t room = storeCap - storeLen, k = len < room ? len : room;
       memcpy(storeBuf + storeLen, buf + 9, k); storeLen += k;

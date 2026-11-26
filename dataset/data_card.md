@@ -1,0 +1,21 @@
+# Data Card — Team 1 ("Paradise") Smart Doorbell Log-Mel Dataset
+
+- **Team / Assignment:** Team 1 (`Paradise`) · AI255TBD Edge AI Module 2 (*"The Doorbell's Ears"*)
+- **Source:** Synthesized deterministically via `edge_ai_assignment2/team_audio.py` (`team=1`, `speech_pool.npz` — 780 multi-voice synthetic word recordings) mixed with Team 1's simulated room acoustics (`7347.98 Hz` regulator whine at `0.0505` amp, `100.0 Hz` mains hum, `0.007695` Gaussian room noise).
+- **Audio & Stream Settings (Captured on Physical ESP32-S3 via `COM11`):**
+  - Sample rate: `16,000 Hz`, mono, `antialias=True` (255-tap Blackman low-pass before decimation)
+  - Sample format: `int16` (`<i2`), scale `S = 1.0`, `samples_per_packet = 320`, `speed = 1.0` (real-time `144.0 s`)
+  - Feature extraction on ESP32-S3 (`features.h` radix-2 FFT): `win = 480` (30 ms, symmetric Hann), `hop = 320` (20 ms), `nfft = 512`, `40` HTK mel bands (`20–8000 Hz`), `10*log10(max(band, 1e-10))`, `float32`.
+- **Dataset Size & Class Distribution:**
+  - Source clips: `144` one-second clips (`24` clips × `6` classes: `on`, `off`, `stop`, `go`, `_unknown`, `_silence`).
+  - Raw stream frames received from board: `7,199` frames (`40` bands each).
+  - Clean single-clip dataset (`dataset/doorbell_team1_esp32_features.npz` & `.csv`): **`7,056` frames** (`49` frames/clip × `144` clips = **`1,176` frames per class**, perfectly balanced).
+  - **Straddling frames decision:** `143` inter-clip frames (`first_sample = c*16000 + 15680`, spanning 320 samples of clip `c` and 160 samples of clip `c+1`) were excluded from the labelled dataset to prevent cross-clip label contamination.
+- **Data Integrity & Loss Accounting:**
+  - `packets_sent = 7,200`, `frames_ok = 7,201` (7,200 data + 1 END), `bad_crc = 0`, `bad_len = 0`, `seq_gaps = 0`, `dup = 0`, `uart_errors = 0`, `samples = 2,304,000`.
+  - `expected_features = 7,199`, `received_features = 7,199`, `lost_features = 0`, `bad_crc_back = 0`.
+  - Stored audio (`4,608,000 B` in OPI PSRAM and `/rec.bin` on LittleFS Flash) matched host CRC-32 (`55c3d431`).
+- **Known Limitations & Out-of-Scope Uses:**
+  - Audio is synthesized in Python from a single speech pool and played over USB serial (`team_audio.py`), not captured from a physical MEMS/I2S microphone in an uncontrolled room.
+  - Because each 1-s clip shares speaker/room characteristics across its 49 frames, ML train/test splits **must split by `clip_id`** (never randomly by frame) to avoid data leakage.
+  - Should **not** be used to claim real-world far-field, multi-speaker, or noisy outdoor doorbell accuracy.
