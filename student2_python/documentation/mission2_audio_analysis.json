@@ -1,0 +1,91 @@
+{
+  "team": 1,
+  "aliasing": {
+    "silence_clip_id": 120,
+    "peak_48khz_hz": 7348.0,
+    "peak_48khz_db": -31.97,
+    "peak_8khz_no_aa_hz": 652.0,
+    "peak_8khz_no_aa_db": -31.94,
+    "reconstructed_true_freq_hz": 7348.0,
+    "level_8khz_with_aa_at_alias_db": -83.76,
+    "attenuation_db": 51.82
+  },
+  "sqnr": {
+    "word_clip_id": 0,
+    "word_peak_abs": 0.4544,
+    "silence_clip_id": 120,
+    "silence_peak_abs": 0.03624,
+    "dataset_global_peak_abs": 0.67562,
+    "single_clip_table": [
+      {
+        "fmt": "i16",
+        "scale": 1.0,
+        "word_sqnr_db": 77.12,
+        "word_clipped_pct": 0.0,
+        "silence_sqnr_db": 61.9,
+        "silence_clipped_pct": 0.0
+      },
+      {
+        "fmt": "i8",
+        "scale": 1.0,
+        "word_sqnr_db": 28.95,
+        "word_clipped_pct": 0.0,
+        "silence_sqnr_db": 13.66,
+        "silence_clipped_pct": 0.0
+      },
+      {
+        "fmt": "i8",
+        "scale": 0.5,
+        "word_sqnr_db": 34.93,
+        "word_clipped_pct": 0.0,
+        "silence_sqnr_db": 19.65,
+        "silence_clipped_pct": 0.0
+      },
+      {
+        "fmt": "i8",
+        "scale": 0.25,
+        "word_sqnr_db": 15.39,
+        "word_clipped_pct": 1.694,
+        "silence_sqnr_db": 25.72,
+        "silence_clipped_pct": 0.0
+      },
+      {
+        "fmt": "i8",
+        "scale": 0.125,
+        "word_sqnr_db": 6.81,
+        "word_clipped_pct": 6.45,
+        "silence_sqnr_db": 31.7,
+        "silence_clipped_pct": 0.0
+      }
+    ],
+    "all_144_clips_summary": {
+      "i16_S1.0": {
+        "mean_sqnr_db": 74.21,
+        "min_sqnr_db": 61.84,
+        "max_sqnr_db": 82.93
+      },
+      "i8_S1.0": {
+        "mean_sqnr_db": 25.98,
+        "min_sqnr_db": 13.6,
+        "max_sqnr_db": 34.71
+      },
+      "i8_S0.5": {
+        "mean_sqnr_db": 29.53,
+        "min_sqnr_db": 19.6,
+        "max_sqnr_db": 37.47
+      },
+      "i8_S0.25": {
+        "mean_sqnr_db": 16.25,
+        "min_sqnr_db": 8.82,
+        "max_sqnr_db": 28.58
+      }
+    }
+  },
+  "recommended_config": {
+    "fs": 16000,
+    "antialias": true,
+    "fmt": "i16",
+    "scale": 1.0,
+    "rationale": "16 kHz preserves full speech band up to 8 kHz (above Team 1's 7348 Hz whine, avoiding aliasing into speech bands), antialias=True suppresses out-of-band energy, and int16 with S=1.0 prevents any clipping (max amplitude 0.6705 < 1.0) while achieving >69 dB mean SQNR across all 144 clips at 32,000 B/s (easily real-time on both COM 921600 and USB). Total 144-clip size = 4,608,000 bytes (~4.39 MiB), which fits cleanly in 8 MB OPI PSRAM and 16 MB Flash LittleFS."
+  }
+}

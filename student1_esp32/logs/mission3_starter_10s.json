@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-11-26T15:46:33.312490",
+  "port": "COM11",
+  "seconds": 10,
+  "fs": 16000,
+  "fmt": "i16",
+  "scale": 1.0,
+  "win": 480,
+  "hop": 320,
+  "nfft": 512,
+  "mels": 40,
+  "mfcc": 0,
+  "feat": true,
+  "speed": 1.0,
+  "expected_features": 499,
+  "received_features": 16,
+  "lost_features": 483,
+  "bad_crc_back": 0,
+  "send_seconds": 10.0014,
+  "compute_us": {
+    "min": 1855679,
+    "mean": 1863425.25,
+    "max": 1911835
+  },
+  "lag_s": {
+    "min": 1.9262,
+    "mean": 15.7659,
+    "max": 29.561
+  },
+  "numerical_diff_vs_numpy_quantised": {
+    "matched_frames": 16,
+    "max_abs_diff_db": 0.000126,
+    "mean_abs_diff_db": 2.2e-05,
+    "rmse_db": 3.2e-05,
+    "within_0_05_db": true
+  },
+  "board": null
+}

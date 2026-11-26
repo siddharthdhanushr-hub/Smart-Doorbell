@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-11-26T15:41:19.643483",
+  "phase": "post_power_cycle_verify",
+  "port": "COM11",
+  "info_after_replug": {
+    "cpu_mhz": 240,
+    "heap_free": 287964,
+    "heap_largest": 233460,
+    "psram_size": 8388608,
+    "psram_free": 8317200,
+    "psram_largest": 8257524,
+    "flash_chip": 16777216,
+    "fs_total": 7208960,
+    "fs_used": 4628480,
+    "stored": 0,
+    "where": "none"
+  },
+  "psram_crc_after_replug": {
+    "where": "psram",
+    "n": 0,
+    "crc": 0
+  },
+  "flash_crc_after_replug": {
+    "where": "flash",
+    "n": 4608000,
+    "crc": 1438897201
+  },
+  "flash_dump_bytes": 4608000,
+  "expected_bytes": 4608000,
+  "host_crc32_hex": "55c3d431",
+  "flash_crc_hex": "55c3d431",
+  "flash_exact_byte_match": true,
+  "psram_survived_power_cut": false
+}

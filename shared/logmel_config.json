@@ -1,0 +1,32 @@
+{
+  "team_number": 1,
+  "source_of_truth": "edge_ai_assignment2/README.md (Section 5) & doorbell_board_starter/features.h",
+  "fs": 16000,
+  "win_samples": 480,
+  "win_ms": 30.0,
+  "hop_samples": 320,
+  "hop_ms": 20.0,
+  "nfft": 512,
+  "mels": 40,
+  "mfcc": 0,
+  "window": "hann_symmetric_np_hanning",
+  "fmin_hz": 20.0,
+  "fmax_hz": 8000.0,
+  "mel_scale": "htk_2595_log10",
+  "spectrum": "power_unnormalized_div_nfft",
+  "log_conversion": "10*log10(max(band, 1e-10))",
+  "normalisation": "none",
+  "frames_per_1s_clip": 49,
+  "output_shape_per_clip": [49, 40],
+  "output_dtype": "float32",
+  "secondary_test_config_25ms_10ms_mfcc13": {
+    "fs": 16000,
+    "win_samples": 400,
+    "hop_samples": 160,
+    "nfft": 512,
+    "mels": 40,
+    "mfcc": 13,
+    "frames_per_1s_clip": 98,
+    "output_shape_per_clip": [98, 13]
+  }
+}
