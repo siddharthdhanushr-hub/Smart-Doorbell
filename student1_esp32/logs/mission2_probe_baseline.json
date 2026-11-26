@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-11-26T15:21:45.418051",
+  "port": "COM11",
+  "info": {
+    "cpu_mhz": 240,
+    "heap_free": 256208,
+    "heap_largest": 204788,
+    "psram_size": 0,
+    "psram_free": 0,
+    "psram_largest": 0,
+    "flash_chip": 16777216,
+    "fs_total": 1441792,
+    "fs_used": 8192,
+    "stored": 0,
+    "where": "none"
+  },
+  "psram_test_ok": false,
+  "psram_error": "ERR no psram (Tools > PSRAM)",
+  "psram_result": null,
+  "sram_max_bytes": 142070,
+  "sram_max_seconds_16khz_i16": 4.44,
+  "sram_full_verify": {
+    "why": "end",
+    "frames_ok": 223,
+    "bad_crc": 0,
+    "bad_len": 0,
+    "seq_gaps": 0,
+    "dup": 0,
+    "samples": 71035,
+    "stored": 142070,
+    "where": "sram",
+    "store_full": 0,
+    "features": 0,
+    "max_us": 0,
+    "avg_us": 0,
+    "uart_errors": 0,
+    "ms": 1107
+  },
+  "sram_probe_attempts": [
+    {
+      "bytes": 102906,
+      "ok": true,
+      "stored": 16000
+    },
+    {
+      "bytes": 154358,
+      "ok": true,
+      "stored": 16000
+    },
+    {
+      "bytes": 180084,
+      "ok": false,
+      "err": "ERR alloc sram want=180084 largest=159732"
+    },
+    {
+      "bytes": 167220,
+      "ok": false,
+      "err": "ERR alloc sram want=167220 largest=159732"
+    },
+    {
+      "bytes": 160788,
+      "ok": false,
+      "err": "ERR alloc sram want=160788 largest=155636"
+    },
+    {
+      "bytes": 157572,
+      "ok": false,
+      "err": "ERR alloc sram want=157572 largest=155636"
+    },
+    {
+      "bytes": 155964,
+      "ok": false,
+      "err": "ERR alloc sram want=155964 largest=151540"
+    }
+  ]
+}

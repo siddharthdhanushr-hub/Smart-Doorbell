@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-11-26T15:30:57.375491",
+  "phase": "save144",
+  "port": "COM11",
+  "fs": 16000,
+  "fmt": "i16",
+  "scale": 1.0,
+  "speed": 4.0,
+  "num_clips": 144,
+  "expected_bytes": 4608000,
+  "host_crc32_hex": "55c3d431",
+  "info_before": {
+    "cpu_mhz": 240,
+    "heap_free": 287976,
+    "heap_largest": 233460,
+    "psram_size": 8388608,
+    "psram_free": 8350688,
+    "psram_largest": 8257524,
+    "flash_chip": 16777216,
+    "fs_total": 7208960,
+    "fs_used": 8192,
+    "stored": 0,
+    "where": "none"
+  },
+  "stream_board": {
+    "why": "end",
+    "frames_ok": 7201,
+    "bad_crc": 0,
+    "bad_len": 0,
+    "seq_gaps": 0,
+    "dup": 0,
+    "samples": 2304000,
+    "stored": 4608000,
+    "where": "psram",
+    "store_full": 0,
+    "features": 0,
+    "max_us": 0,
+    "avg_us": 0,
+    "uart_errors": 0,
+    "ms": 35997
+  },
+  "send_seconds": 36.0019,
+  "psram_crc": {
+    "where": "psram",
+    "n": 4608000,
+    "crc": 1438897201
+  },
+  "psram_exact_match": true,
+  "save_reply": {
+    "n": 4608000,
+    "us": 10556511,
+    "crc": 1438897201
+  },
+  "flash_crc": {
+    "where": "flash",
+    "n": 4608000,
+    "crc": 1438897201
+  },
+  "flash_crc_match": true,
+  "info_after": {
+    "cpu_mhz": 240,
+    "heap_free": 287652,
+    "heap_largest": 233460,
+    "psram_size": 8388608,
+    "psram_free": 3632092,
+    "psram_largest": 3538932,
+    "flash_chip": 16777216,
+    "fs_total": 7208960,
+    "fs_used": 4628480,
+    "stored": 4608000,
+    "where": "psram"
+  }
+}
