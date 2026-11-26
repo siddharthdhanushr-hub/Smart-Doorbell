@@ -1,0 +1,42 @@
+{
+  "protocol_name": "Doorbell Ears Serial Protocol",
+  "source_of_truth": "edge_ai_assignment2/README.md, board_link.py, doorbell_board_starter.ino",
+  "status": "Starter baseline (Student 1 & Student 2 coordinate extensions before Phase 2 benchmarks)",
+  "endianness": "little-endian",
+  "max_payload_bytes": 4096,
+  "crc_algorithm": "CRC-32 (IEEE 802.3 / Python zlib.crc32)",
+  "crc_coverage": ["type (1 byte)", "seq (4 bytes)", "len (2 bytes)", "payload (len bytes)"],
+  "text_commands": {
+    "PING": "-> PONG",
+    "INFO": "-> INFO cpu_mhz=... heap_free=... heap_largest=... psram_size=... psram_free=... psram_largest=... flash_chip=... fs_total=... fs_used=... stored=... where=...",
+    "BAUD <rate>": "-> OK BAUD <rate> (COM/UART bridge only; native USB ignores baud)",
+    "STREAM": "STREAM fs=<hz> fmt=<f32|i16|i8> scale=<float> win=<samples> hop=<samples> nfft=<pow2> mels=<int> mfcc=<int> feat=<0|1> store=<none|sram|psram> max=<bytes> -> READY ...",
+    "SAVE": "-> TODO in Mission 2 (currently returns ERR SAVE not written yet)",
+    "DUMP <sram|psram|flash>": "-> DATA <n> followed by n raw bytes",
+    "CRC <sram|psram|flash>": "-> CRC where=<where> n=<bytes> crc=<hex>",
+    "FREE": "-> OK FREE"
+  },
+  "binary_frames": {
+    "uplink_laptop_to_board": {
+      "magic": "0xA5 0x5A",
+      "layout": "magic(2B) | type(1B) | seq(u32) | len(u16) | payload(len B) | crc32(u32)",
+      "types": {
+        "D": "Audio sample bytes in fmt (f32=<f4, i16=<i2, i8=int8)",
+        "E": "End of stream (len=0)"
+      }
+    },
+    "downlink_board_to_laptop": {
+      "magic": "0xB5 0x5B",
+      "layout": "magic(2B) | type(1B) | seq(u32) | len(u16) | payload(len B) | crc32(u32)",
+      "types": {
+        "F": "Feature frame: first_sample(u32) | compute_us(u32) | features(float32[out])",
+        "S": "Stream summary text: why=... frames_ok=... bad_crc=... bad_len=... seq_gaps=... dup=... samples=... stored=... where=... store_full=... features=... max_us=... avg_us=... uart_errors=... ms=..."
+      }
+    }
+  },
+  "sample_formats": {
+    "f32": {"bytes_per_sample": 4, "numpy_dtype": "<f4"},
+    "i16": {"bytes_per_sample": 2, "numpy_dtype": "<i2", "qmax": 32767},
+    "i8":  {"bytes_per_sample": 1, "numpy_dtype": "int8", "qmax": 127}
+  }
+}
