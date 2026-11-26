@@ -1,0 +1,32 @@
+{
+  "team_number": 1,
+  "team_name": "Paradise",
+  "board_operator": "Siddharth Dhanush R (Student 1)",
+  "target_board": "ESP32-S3-DevKitC-1 N16R8",
+  "arduino_ide": {
+    "esp32_core_package": "esp32 by Espressif Systems",
+    "esp32_core_version_installed": "3.3.12",
+    "fqbn_base": "esp32:esp32:esp32s3",
+    "board_menu": "ESP32S3 Dev Module",
+    "initial_settings": {
+      "USB_CDC_On_Boot": "Enabled"
+    },
+    "mission2_settings_to_verify": {
+      "Flash_Size": "16MB (128Mb)",
+      "PSRAM": "OPI PSRAM",
+      "Partition_Scheme": "TBD after checking fs_total via INFO"
+    }
+  },
+  "usb_ports": {
+    "usb_native_cdc": {
+      "port": "Not yet tested (connect USB-C cable to USB port)",
+      "baud_note": "Ignored by native USB CDC"
+    },
+    "com_uart_bridge": {
+      "port": "Not yet tested (connect USB-C cable to COM/UART port)",
+      "default_baud": 921600,
+      "rx_buffer_bytes": 32768
+    }
+  },
+  "board_info_measured": "Not yet tested"
+}

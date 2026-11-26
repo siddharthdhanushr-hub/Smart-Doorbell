@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Audio previews & large raw pool (keep speech_pool.npz local)
+*.wav
+speech_pool.npz
+
+# Arduino / build artifacts
+build/
+*.bin
+*.elf
+*.map
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
