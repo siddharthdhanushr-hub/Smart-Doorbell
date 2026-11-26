@@ -18,9 +18,11 @@ from typing import Any, Dict, List
 import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ASSIGNMENT_DIR = REPO_ROOT.parent / "edge_ai_assignment2"
-sys.path.insert(0, str(ASSIGNMENT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
+from student2_python.src.paths import resolve_starter_dir  # type: ignore
+
+ASSIGNMENT_DIR = resolve_starter_dir(REPO_ROOT)
+sys.path.insert(0, str(ASSIGNMENT_DIR))
 
 import team_audio as ta  # type: ignore
 from board_link import Board  # type: ignore

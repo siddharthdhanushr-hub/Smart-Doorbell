@@ -17,11 +17,13 @@ from typing import Any, Dict, List
 from flask import Flask, jsonify, request
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ASSIGNMENT_DIR = REPO_ROOT.parent / "edge_ai_assignment2"
-if str(ASSIGNMENT_DIR) not in sys.path:
-    sys.path.insert(0, str(ASSIGNMENT_DIR))
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+from student2_python.src.paths import resolve_starter_dir  # type: ignore
+
+ASSIGNMENT_DIR = resolve_starter_dir(REPO_ROOT)
+if str(ASSIGNMENT_DIR) not in sys.path:
+    sys.path.insert(0, str(ASSIGNMENT_DIR))
 
 import numpy as np
 import team_audio as ta  # type: ignore

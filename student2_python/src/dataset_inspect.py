@@ -105,7 +105,10 @@ def inspect_dataset(team: int, fs: int, antialias: bool, assignment_dir: Path) -
 
 def main() -> None:
     repo_root = Path(__file__).resolve().parents[2]
-    default_assignment_dir = repo_root.parent / "edge_ai_assignment2"
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    from student2_python.src.paths import resolve_starter_dir  # type: ignore
+    default_assignment_dir = resolve_starter_dir(repo_root)
 
     ap = argparse.ArgumentParser(description="Inspect Team 1 audio dataset and generate manifest.")
     ap.add_argument("--team", type=int, default=1)

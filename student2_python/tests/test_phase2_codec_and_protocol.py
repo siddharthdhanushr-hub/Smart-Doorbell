@@ -77,7 +77,8 @@ def test_frame_crc_and_mock_board_skip():
 
 
 def test_clip_loader_team1():
-    assignment_dir = REPO_ROOT.parent / "edge_ai_assignment2"
+    from student2_python.src.paths import resolve_starter_dir
+    assignment_dir = resolve_starter_dir(REPO_ROOT)
     loader = ClipLoader(assignment_dir=assignment_dir, team=1)
     clips = loader.clip_list()
     assert len(clips) == 144

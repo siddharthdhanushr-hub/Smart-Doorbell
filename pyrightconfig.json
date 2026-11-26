@@ -1,0 +1,18 @@
+{
+  "include": [
+    "student1_esp32",
+    "student2_python",
+    "starter_files"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    ".pytest_cache"
+  ],
+  "extraPaths": [
+    ".",
+    "./starter_files"
+  ],
+  "pythonVersion": "3.14",
+  "typeCheckingMode": "basic",
+  "reportMissingModuleSource": "none"
+}

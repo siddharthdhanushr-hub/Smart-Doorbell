@@ -2,11 +2,13 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+.pytest_cache/
 .venv/
 venv/
 
 # Audio previews & large raw pool (keep speech_pool.npz local)
 *.wav
+!dataset/team_01_preview.wav
 speech_pool.npz
 
 # Arduino / build artifacts
