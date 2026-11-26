@@ -191,7 +191,13 @@ static void runStream(Stream &s, const char *line) {
 
 // ---------------------------------------------------------------- other commands
 static void writeAll(Stream &s, const uint8_t *p, size_t n) {
-  while (n) { size_t w = s.write(p, n > 1024 ? 1024 : n); if (!w) { delay(1); continue; } p += w; n -= w; }
+  while (n) {
+    size_t chunk = n > 256 ? 256 : n;
+    size_t w = s.write(p, chunk);
+    if (!w) { delay(1); continue; }
+    p += w; n -= w;
+  }
+  s.flush();
 }
 
 static void cmdInfo(Stream &s) {
@@ -290,6 +296,7 @@ static bool readLine(Stream &s, char *acc, size_t &n, char *out, size_t cap) {
 void setup() {
   crcInit();
   Serial.setRxBufferSize(32768);
+  Serial.setTxBufferSize(32768);
   Serial.begin(UART_BAUD_DEFAULT);
 #if ARDUINO_USB_CDC_ON_BOOT
   Serial0.setRxBufferSize(32768);

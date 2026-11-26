@@ -15,14 +15,15 @@
     "esp32_core_package": "esp32 by Espressif Systems",
     "esp32_core_version_installed": "3.3.12",
     "fqbn_phase1": "esp32:esp32:esp32s3:CDCOnBoot=cdc",
+    "fqbn_mission2": "esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=custom,PSRAM=opi",
     "board_menu": "ESP32S3 Dev Module",
     "initial_settings": {
       "USB_CDC_On_Boot": "Enabled"
     },
-    "mission2_settings_to_verify": {
+    "mission2_settings_verified": {
       "Flash_Size": "16MB (128Mb)",
       "PSRAM": "OPI PSRAM",
-      "Partition_Scheme": "TBD in Mission 2 (default 4MB partition gives fs_total=1441792)"
+      "Partition_Scheme": "Custom (student1_esp32/firmware/doorbell_board/partitions.csv -> 6.88 MiB LittleFS)"
     }
   },
   "usb_ports": {
@@ -45,16 +46,24 @@
     }
   },
   "board_info_measured": {
-    "cpu_mhz": 240,
-    "heap_free": 256208,
-    "heap_largest": 204788,
-    "psram_size": 0,
-    "psram_free": 0,
-    "psram_largest": 0,
-    "flash_chip": 16777216,
-    "fs_total": 1441792,
-    "fs_used": 8192,
-    "stored": 0,
-    "where": "none"
+    "phase1_default": {
+      "cpu_mhz": 240,
+      "heap_free": 256208,
+      "heap_largest": 204788,
+      "psram_size": 0,
+      "flash_chip": 16777216,
+      "fs_total": 1441792
+    },
+    "mission2_opi_16m": {
+      "cpu_mhz": 240,
+      "heap_free": 287976,
+      "heap_largest": 233460,
+      "psram_size": 8388608,
+      "psram_free": 8350688,
+      "psram_largest": 8257524,
+      "flash_chip": 16777216,
+      "fs_total": 7208960,
+      "fs_used_after_save144": 4628480
+    }
   }
 }
