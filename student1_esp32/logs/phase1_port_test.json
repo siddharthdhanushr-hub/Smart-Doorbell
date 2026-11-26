@@ -1,0 +1,72 @@
+{
+  "phase": "Phase 1 - ESP32 setup and basic communication",
+  "date": "2026-11-26",
+  "firmware": "student1_esp32/firmware/doorbell_board_starter/doorbell_board_starter.ino",
+  "fqbn": "esp32:esp32:esp32s3:CDCOnBoot=cdc",
+  "upload_port": "COM12",
+  "ports_tested": {
+    "COM11_native_usb": {
+      "device_id": "USB\\VID_303A&PID_1001&MI_00\\7&C8A271C&0&0000",
+      "ping": "PONG",
+      "info": {
+        "cpu_mhz": 240,
+        "heap_free": 256208,
+        "heap_largest": 204788,
+        "psram_size": 0,
+        "psram_free": 0,
+        "psram_largest": 0,
+        "flash_chip": 16777216,
+        "fs_total": 1441792,
+        "fs_used": 8192,
+        "stored": 0,
+        "where": "none"
+      },
+      "basic_stream_test": "Not yet tested (COM11 disconnected during subsequent run)"
+    },
+    "COM12_uart_bridge": {
+      "device_id": "USB\\VID_1A86&PID_55D3\\5C37278289",
+      "baud": 921600,
+      "ping": "PONG",
+      "info": {
+        "cpu_mhz": 240,
+        "heap_free": 256208,
+        "heap_largest": 204788,
+        "psram_size": 0,
+        "psram_free": 0,
+        "psram_largest": 0,
+        "flash_chip": 16777216,
+        "fs_total": 1441792,
+        "fs_used": 8192,
+        "stored": 0,
+        "where": "none"
+      },
+      "basic_stream_test": {
+        "fs": 16000,
+        "fmt": "i16",
+        "feat": false,
+        "store": "none",
+        "speed": 0,
+        "bytes_sent": 32000,
+        "packets_sent": 50,
+        "send_seconds": 0.35382870002649724,
+        "board_summary": {
+          "why": "end",
+          "frames_ok": 51,
+          "bad_crc": 0,
+          "bad_len": 0,
+          "seq_gaps": 0,
+          "dup": 0,
+          "samples": 16000,
+          "stored": 0,
+          "where": "none",
+          "store_full": 0,
+          "features": 0,
+          "max_us": 0,
+          "avg_us": 0,
+          "uart_errors": 0,
+          "ms": 353
+        }
+      }
+    }
+  }
+}
