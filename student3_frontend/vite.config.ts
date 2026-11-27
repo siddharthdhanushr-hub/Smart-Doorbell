@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import http from 'node:http';
 import path from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -49,13 +50,50 @@ function repoStaticBridgePlugin(): Plugin {
     fs.createReadStream(absPath).pipe(res);
   };
 
+  const forwardApiQuietly = (
+    req: import('node:http').IncomingMessage,
+    res: import('node:http').ServerResponse,
+    next: () => void,
+  ) => {
+    if (!req.url || !req.url.startsWith('/api/')) {
+      next();
+      return;
+    }
+    const proxyReq = http.request(
+      {
+        hostname: '127.0.0.1',
+        port: 5000,
+        path: req.url,
+        method: req.method,
+        headers: { ...req.headers, host: '127.0.0.1:5000' },
+        timeout: 1500,
+      },
+      (proxyRes) => {
+        res.writeHead(proxyRes.statusCode ?? 200, proxyRes.headers);
+        proxyRes.pipe(res);
+      },
+    );
+    proxyReq.on('timeout', () => {
+      proxyReq.destroy();
+    });
+    proxyReq.on('error', () => {
+      if (!res.headersSent) {
+        res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ status: 'offline', flaskOnline: false }));
+      }
+    });
+    req.pipe(proxyReq);
+  };
+
   return {
     name: 'smart-doorbell-repo-bridge',
     configureServer(server) {
       server.middlewares.use((req, res, next) => serveRepoFile(req.url, res, next));
+      server.middlewares.use((req, res, next) => forwardApiQuietly(req, res, next));
     },
     configurePreviewServer(server) {
       server.middlewares.use((req, res, next) => serveRepoFile(req.url, res, next));
+      server.middlewares.use((req, res, next) => forwardApiQuietly(req, res, next));
     },
   };
 }
@@ -64,19 +102,5 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), repoStaticBridgePlugin()],
   server: {
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true,
-        configure: (proxy) => {
-          proxy.on('error', (_err, _req, res) => {
-            if (res && 'writeHead' in res && !res.headersSent) {
-              res.writeHead(503, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({ status: 'offline', error: 'Flask API not running on port 5000' }));
-            }
-          });
-        },
-      },
-    },
   },
 });
