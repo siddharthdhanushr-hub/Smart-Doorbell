@@ -1,0 +1,172 @@
+{
+  "dataset": {
+    "total_clips": 144,
+    "valid_clips": 144,
+    "invalid_clips": 0,
+    "duplicate_non_silence_pool_recordings": 0,
+    "class_clip_counts": {
+      "on": 24,
+      "off": 24,
+      "stop": 24,
+      "go": 24,
+      "_unknown": 24,
+      "_silence": 24
+    },
+    "clean_frames": 7056,
+    "excluded_straddling_frames": 143,
+    "frames_per_class": 1176,
+    "class_frame_counts": {
+      "on": 1176,
+      "off": 1176,
+      "stop": 1176,
+      "go": 1176,
+      "_unknown": 1176,
+      "_silence": 1176
+    },
+    "packets_sent": 7200,
+    "frames_ok": 7201,
+    "seq_gaps": 0,
+    "bad_crc": 0,
+    "lost_features": 0
+  },
+  "controlled_skip_test": {
+    "skip_packets": [
+      10,
+      11,
+      200
+    ],
+    "before_fix_samples_rx": 159040,
+    "after_fix_samples_rx": 160000,
+    "before_fix_received_features": 496,
+    "after_fix_received_features": 494,
+    "before_fix_lost_features": 3,
+    "after_fix_lost_features": 5,
+    "before_fix_tail_shift_samples": -1120,
+    "after_fix_tail_shift_samples": -160,
+    "before_fix_last_first_sample": 158400,
+    "after_fix_last_first_sample": 159360,
+    "expected_last_first_sample": 159520,
+    "explanation": "Before fix, missing packets 10, 11 (640 samples) and 200 (320 samples) shifted all subsequent audio backward by 960 samples (total=159,040, last_first_sample=158,400 vs 159,360 aligned). After gap-alignment fix, zeros were inserted at gaps (total=160,000 samples) and 5 frames straddling the 2 gaps were dropped, preserving exact timeline alignment (last_first_sample=159,360) for all 494 clean frames."
+  },
+  "port_limits": {
+    "usb_com11_max_zero_loss_speed": 6.0,
+    "com12_921600_max_lag_free_speed": 2.5,
+    "com12_2000000_max_lag_free_speed": 6.0,
+    "usb_com11_sweep": [
+      {
+        "speed": 2.0,
+        "lost_features": 0,
+        "seq_gaps": 0,
+        "bad_crc": 0,
+        "samples_rx": 80000,
+        "sample_loss_pct": 0.0
+      },
+      {
+        "speed": 4.0,
+        "lost_features": 0,
+        "seq_gaps": 0,
+        "bad_crc": 0,
+        "samples_rx": 80000,
+        "sample_loss_pct": 0.0
+      },
+      {
+        "speed": 6.0,
+        "lost_features": 0,
+        "seq_gaps": 0,
+        "bad_crc": 0,
+        "samples_rx": 80000,
+        "sample_loss_pct": 0.0
+      },
+      {
+        "speed": 8.0,
+        "lost_features": 136,
+        "seq_gaps": 136,
+        "bad_crc": 68,
+        "samples_rx": 36480,
+        "sample_loss_pct": 54.4
+      },
+      {
+        "speed": 10.0,
+        "lost_features": 170,
+        "seq_gaps": 170,
+        "bad_crc": 80,
+        "samples_rx": 25600,
+        "sample_loss_pct": 68.0
+      }
+    ],
+    "com12_921600_sweep": [
+      {
+        "speed": 1.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0226,
+        "target_uplink_bps": 32000
+      },
+      {
+        "speed": 2.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0175,
+        "target_uplink_bps": 64000
+      },
+      {
+        "speed": 2.5,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0167,
+        "target_uplink_bps": 80000
+      },
+      {
+        "speed": 3.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0716,
+        "target_uplink_bps": 96000
+      },
+      {
+        "speed": 4.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.3191,
+        "target_uplink_bps": 128000
+      }
+    ],
+    "com12_2000000_sweep": [
+      {
+        "speed": 2.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0113,
+        "target_uplink_bps": 64000
+      },
+      {
+        "speed": 4.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0088,
+        "target_uplink_bps": 128000
+      },
+      {
+        "speed": 5.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.008,
+        "target_uplink_bps": 160000
+      },
+      {
+        "speed": 6.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.0082,
+        "target_uplink_bps": 192000
+      },
+      {
+        "speed": 8.0,
+        "lost_features": 0,
+        "sample_loss_pct": 0.0,
+        "lag_s_max": 0.1189,
+        "target_uplink_bps": 256000
+      }
+    ]
+  }
+}
