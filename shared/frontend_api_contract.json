@@ -1,9 +1,9 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "team": 1,
   "team_name": "Paradise",
-  "generated_by": "Student 1 & Student 2 (Siddharth Dhanush R)",
-  "note_for_student3": "All files below live in the repository and contain measured hardware/Python outputs (no live ESP32 connection required by the dashboard). A lightweight Flask API wrapping these endpoints is also provided at student2_python/api/server.py.",
+  "generated_by": "Team 1 Paradise (Students 1-4 Stage B Integration)",
+  "note_for_student3": "All files below live in the repository and contain measured hardware/Python/validation outputs (no live ESP32 connection required by the dashboard). Flask serves /api/* via student2_python/api/server.py and Vite dev server serves repo JSON/plot files directly via /repo/*.",
   "flask_api": {
     "command": "py student2_python/api/server.py --port 5000",
     "endpoints": [
@@ -15,6 +15,19 @@
       "GET /api/benchmarks/mission2",
       "GET /api/benchmarks/mission3",
       "GET /api/benchmarks/mission4_5"
+    ]
+  },
+  "vite_repo_bridge": {
+    "command": "npm run dev -- --port 5173",
+    "working_directory": "student3_frontend",
+    "base_path": "/repo/",
+    "mounted_directories": [
+      "shared",
+      "dataset",
+      "student1_esp32/benchmarks",
+      "student1_esp32/logs",
+      "student2_python/documentation",
+      "student4_validation/outputs"
     ]
   },
   "data_sources": {
@@ -37,7 +50,20 @@
     "mission3_optimized_json": "student1_esp32/logs/mission3_optimized_results.json",
     "mission4_skip_before_json": "student1_esp32/logs/mission4_skip_before_fix.json",
     "mission4_skip_after_json": "student1_esp32/logs/mission4_skip_after_fix.json",
-    "phase5_144clips_all_runs_json": "student1_esp32/logs/phase5_144clips_all_runs.json"
+    "phase5_144clips_all_runs_json": "student1_esp32/logs/phase5_144clips_all_runs.json",
+    "student4_mission4_validation_json": "student4_validation/outputs/mission4_validation_summary.json",
+    "student4_mission5_comparison_json": "student4_validation/outputs/mission5_feature_comparison.json",
+    "student4_mission5_comparison_csv": "student4_validation/outputs/mission5_feature_comparison.csv",
+    "student4_mission5_classifier_json": "student4_validation/outputs/mission5_classifier_results.json",
+    "student4_mission5_classifier_csv": "student4_validation/outputs/mission5_classifier_results.csv",
+    "student4_plots": [
+      "student4_validation/outputs/plots/mission4_port_speed_limits.png",
+      "student4_validation/outputs/plots/mission4_skip_alignment.png",
+      "student4_validation/outputs/plots/mission5_confusion_matrices.png",
+      "student4_validation/outputs/plots/mission5_diff_heatmaps.png",
+      "student4_validation/outputs/plots/mission5_per_band_mae.png",
+      "student4_validation/outputs/plots/mission5_per_class_mae.png"
+    ]
   },
   "feature_arrays_for_student4": {
     "esp32_16k_i16_S1.0_speed1": {

@@ -76,6 +76,9 @@ def test_frame_crc_and_mock_board_skip():
     assert res["board"]["seq_gaps"] == 2
     assert res["board"]["samples"] == 320 * 8
 
+    res_pkt0 = mb.stream(payload, fs=16000, fmt="i16", samples_per_packet=320, store="none", skip=(0,))
+    assert res_pkt0["board"]["seq_gaps"] == 1
+
 
 def test_clip_loader_team1():
     from student2_python.src.paths import resolve_starter_dir
