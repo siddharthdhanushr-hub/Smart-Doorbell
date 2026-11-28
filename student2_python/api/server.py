@@ -87,10 +87,13 @@ def create_app() -> Flask:
             return jsonify({"error": f"fs must be one of {ta.ALLOWED_FS}"}), 400
 
         clips = dict(ta.clip_list(1))
-        x = ta.get_clip(1, clip_id, fs=fs, antialias=antialias)
+        try:
+            x = ta.get_clip(1, clip_id, fs=fs, antialias=antialias)
+        except FileNotFoundError as exc:
+            return jsonify({"error": str(exc), "hint": "Place speech_pool.npz in starter_files/"}), 503
         win = 480 if fs == 16000 else int(round(0.030 * fs))
         hop = 320 if fs == 16000 else int(round(0.020 * fs))
-        nfft = 512 if fs == 16000 else 256
+        nfft = 1 << (win - 1).bit_length()
         py_feat, first_samp = py_features(x, fs=fs, win=win, hop=hop, nfft=nfft, mels=40, mfcc=0)
 
         esp_feat = None

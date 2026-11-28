@@ -9,10 +9,9 @@ Follows edge_ai_assignment2/README.md (Section 5) and features.h:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Tuple
 
 import matplotlib
 matplotlib.use("Agg")
@@ -44,7 +43,7 @@ def build_mel_filterbank(fs: int, nfft: int, mels: int, fmin: float = 20.0) -> n
     nb = nfft // 2 + 1
     m0 = float(hz_to_mel_htk(fmin))
     m1 = float(hz_to_mel_htk(fs / 2.0))
-    edges = mel_to_hz_htk(np.linspace(m0, m1, mels + 2))
+    edges = np.asarray(mel_to_hz_htk(np.linspace(m0, m1, mels + 2)), dtype=np.float64)
     freqs = np.arange(nb, dtype=np.float64) * (float(fs) / float(nfft))
     fb = np.zeros((mels, nb), dtype=np.float64)
     for m in range(mels):
@@ -76,6 +75,15 @@ def features(
     Compute log-mel (or MFCC) features matching README Section 5 and features.h.
     Returns (feats [n_frames, out_dim] float32, first_sample [n_frames] int64).
     """
+    if fs <= 40:
+        raise ValueError(f"fs must be > 40 Hz, got {fs}")
+    if win < 2 or hop < 1:
+        raise ValueError(f"Invalid frame parameters: win={win}, hop={hop}")
+    if nfft < win or (nfft & (nfft - 1)) != 0:
+        raise ValueError(f"nfft ({nfft}) must be a power of 2 >= win ({win})")
+    if mels < 1 or not (0 <= mfcc <= mels):
+        raise ValueError(f"Invalid mel/mfcc parameters: mels={mels}, mfcc={mfcc}")
+
     x_arr = np.asarray(x, dtype=np.float64)
     if x_arr.size < win:
         dim = mfcc if mfcc > 0 else mels
@@ -130,6 +138,8 @@ def export_dataset_reference(
             first_samples = fsamp
 
     arr = np.stack(feat_list, axis=0)  # (144, frames, dim)
+    if first_samples is None:
+        first_samples = np.zeros((0,), dtype=np.int64)
     out_dir = REPO_ROOT / "student2_python" / "feature_arrays"
     out_dir.mkdir(parents=True, exist_ok=True)
     tag = f"team{team}_{fs}hz_{fmt}_S{scale}_win{win}_hop{hop}_mels{mels}_mfcc{mfcc}"
@@ -164,7 +174,8 @@ def plot_one_per_class(team: int = 1, fs: int = 16000) -> Path:
         ax.set_title(f"{lab} (clip_id={cid})")
         ax.set_xlabel("Frame (hop=20 ms)")
         ax.set_ylabel("Mel band (0..39)")
-    fig.colorbar(im, ax=axes.ravel().tolist(), label="Log-mel power (dB)")
+    if im is not None:
+        fig.colorbar(im, ax=axes.ravel().tolist(), label="Log-mel power (dB)")
     fig.suptitle("Team 1 Log-Mel Spectrograms (16 kHz, win=480, hop=320, nfft=512, 40 mels)")
     out_dir = REPO_ROOT / "student2_python" / "documentation"
     out_dir.mkdir(parents=True, exist_ok=True)
