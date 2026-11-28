@@ -87,17 +87,24 @@ static void pushSamples(Stream &s, const uint8_t *p, size_t nbytes) {
   st.samples += n;
 }
 
+static void freeStreamBufs() {
+  feat.end();
+  free(fbuf); fbuf = nullptr;
+  free(fout); fout = nullptr;
+}
+
 static void finishStream(Stream &s, const char *why) {
   char txt[400];
-  uint32_t secs_ms = st.tLast - st.t0;
+  uint32_t secs_ms = (st.framesOk > 0 && st.tLast >= st.t0) ? (st.tLast - st.t0) : 0;
   int n = snprintf(txt, sizeof(txt),
     "why=%s frames_ok=%u bad_crc=%u bad_len=%u seq_gaps=%u dup=%u samples=%u stored=%u where=%s store_full=%u "
     "features=%u max_us=%u avg_us=%u uart_errors=%u ms=%u",
-    why, st.framesOk, st.badCrc, st.badLen, st.seqGaps, st.dup, st.samples, (unsigned)storeLen, storeWhere,
-    st.storeFull, st.featSent, st.maxUs, st.featSent ? (unsigned)(st.sumUs / st.featSent) : 0,
-    (unsigned)uartErrors, secs_ms);
+    why, (unsigned)st.framesOk, (unsigned)st.badCrc, (unsigned)st.badLen, (unsigned)st.seqGaps,
+    (unsigned)st.dup, (unsigned)st.samples, (unsigned)storeLen, storeWhere, (unsigned)st.storeFull,
+    (unsigned)st.featSent, (unsigned)st.maxUs, st.featSent ? (unsigned)(st.sumUs / st.featSent) : 0,
+    (unsigned)uartErrors, (unsigned)secs_ms);
   sendFrame(s, 'S', 0, (const uint8_t *)txt, n);
-  feat.end(); free(fbuf); fbuf = nullptr; free(fout); fout = nullptr;
+  freeStreamBufs();
 }
 
 static bool kv(const char *line, const char *key, char *out, size_t cap) {
@@ -124,8 +131,18 @@ static void runStream(Stream &s, const char *line) {
   else if (!strcmp(fmtName, "i16")) { fmtBytes = 2; qmaxInv = 1.0f / 32767.0f; }
   else if (!strcmp(fmtName, "i8")) { fmtBytes = 1; qmaxInv = 1.0f / 127.0f; }
   else { s.printf("ERR fmt must be f32, i16 or i8\n"); return; }
-  if (!feat.begin(c)) { s.printf("ERR feature settings (nfft power of 2, win<=nfft, mels<=128, mfcc<=mels)\n"); return; }
-  fbuf = (float *)malloc(sizeof(float) * c.win); fout = (float *)malloc(sizeof(float) * feat.outSize());
+  if (!feat.begin(c)) { s.printf("ERR feature settings (fs>40, nfft power of 2, win<=nfft, mels<=128, mfcc<=mels)\n"); return; }
+  if (featOn) {
+    fbuf = (float *)malloc(sizeof(float) * c.win);
+    fout = (float *)malloc(sizeof(float) * feat.outSize());
+    if (!fbuf || !fout) {
+      s.printf("ERR alloc feature buffers\n");
+      freeStreamBufs();
+      return;
+    }
+  } else {
+    feat.end();   // free mel tables when feat=0 to preserve internal SRAM
+  }
   fcount = 0;
 
   char where[8] = "none"; size_t want = 0;
@@ -133,16 +150,16 @@ static void runStream(Stream &s, const char *line) {
   if (kv(line, "max", v, sizeof v)) want = strtoul(v, nullptr, 10);
   freeStore();
   if (strcmp(where, "none")) {
-    if (!want) { s.printf("ERR store needs max=<bytes>\n"); feat.end(); return; }
+    if (!want) { s.printf("ERR store needs max=<bytes>\n"); freeStreamBufs(); return; }
     uint32_t caps = !strcmp(where, "psram") ? (MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)
                   : !strcmp(where, "sram") ? (MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT) : 0;
-    if (!caps) { s.printf("ERR store must be none, sram or psram\n"); feat.end(); return; }
-    if (caps & MALLOC_CAP_SPIRAM && !psramFound()) { s.printf("ERR no psram (Tools > PSRAM)\n"); feat.end(); return; }
+    if (!caps) { s.printf("ERR store must be none, sram or psram\n"); freeStreamBufs(); return; }
+    if (caps & MALLOC_CAP_SPIRAM && !psramFound()) { s.printf("ERR no psram (Tools > PSRAM)\n"); freeStreamBufs(); return; }
     storeBuf = (uint8_t *)heap_caps_malloc(want, caps);
     if (!storeBuf) {
       s.printf("ERR alloc %s want=%u largest=%u\n", where, (unsigned)want,
                (unsigned)heap_caps_get_largest_free_block(caps));
-      feat.end(); return;
+      freeStreamBufs(); return;
     }
     storeCap = want; strcpy(storeWhere, where);
   }
@@ -186,6 +203,7 @@ static void runStream(Stream &s, const char *line) {
     st.lastSeq = seq; st.framesOk++; st.tLast = millis();
     if (type == 'E') { finishStream(s, "end"); return; }
     if (type != 'D') continue;
+    if (len % fmtBytes != 0) { st.badLen++; continue; }
     uint32_t n = len / fmtBytes;
     if (pktSamples == 0 && n > 0) pktSamples = n;
     if (gapPkts > 0) {
@@ -306,12 +324,12 @@ static void handle(Stream &s, char *line) {
   else s.printf("ERR unknown command: %s\n", line);
 }
 
-static bool readLine(Stream &s, char *acc, size_t &n, char *out, size_t cap) {
+static bool readLine(Stream &s, char *acc, size_t &n, size_t accCap, char *out, size_t cap) {
   while (s.available()) {
     char c = (char)s.read();
     if (c == '\r') continue;
     if (c == '\n') { acc[n] = 0; strncpy(out, acc, cap); out[cap - 1] = 0; n = 0; return true; }
-    if (n < 159) acc[n++] = c;
+    if (n < accCap - 1) acc[n++] = c;
   }
   return false;
 }
@@ -324,16 +342,16 @@ void setup() {
 #if ARDUINO_USB_CDC_ON_BOOT
   Serial0.setRxBufferSize(32768);
   Serial0.begin(UART_BAUD_DEFAULT);
-  Serial0.onReceiveError([](hardwareSerial_error_t) { uartErrors++; });
+  Serial0.onReceiveError([](hardwareSerial_error_t) { uartErrors = uartErrors + 1; });
 #endif
   fsOk = LittleFS.begin(true);
 }
 
 void loop() {
-  static char acc0[160], acc1[160], line[160]; static size_t n0 = 0, n1 = 0;
-  if (readLine(Serial, acc0, n0, line, sizeof line)) handle(Serial, line);
+  static char acc0[256], acc1[256], line[256]; static size_t n0 = 0, n1 = 0;
+  if (readLine(Serial, acc0, n0, sizeof acc0, line, sizeof line)) handle(Serial, line);
 #if ARDUINO_USB_CDC_ON_BOOT
-  if (readLine(Serial0, acc1, n1, line, sizeof line)) handle(Serial0, line);
+  if (readLine(Serial0, acc1, n1, sizeof acc1, line, sizeof line)) handle(Serial0, line);
 #endif
   delay(0);
 }

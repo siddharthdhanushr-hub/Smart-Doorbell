@@ -1,7 +1,7 @@
 {
   "protocol_name": "Doorbell Ears Serial Protocol",
-  "source_of_truth": "edge_ai_assignment2/README.md, board_link.py, doorbell_board_starter.ino",
-  "status": "Starter baseline (Student 1 & Student 2 coordinate extensions before Phase 2 benchmarks)",
+  "source_of_truth": "edge_ai_assignment2/README.md, board_link.py, student1_esp32/firmware/doorbell_board/doorbell_board.ino",
+  "status": "Verified Stage A firmware (Mission 2 SAVE, Mission 3 Radix-2 FFT, Mission 4 gap-aligned first_sample active)",
   "endianness": "little-endian",
   "max_payload_bytes": 4096,
   "crc_algorithm": "CRC-32 (IEEE 802.3 / Python zlib.crc32)",
@@ -11,7 +11,7 @@
     "INFO": "-> INFO cpu_mhz=... heap_free=... heap_largest=... psram_size=... psram_free=... psram_largest=... flash_chip=... fs_total=... fs_used=... stored=... where=...",
     "BAUD <rate>": "-> OK BAUD <rate> (COM/UART bridge only; native USB ignores baud)",
     "STREAM": "STREAM fs=<hz> fmt=<f32|i16|i8> scale=<float> win=<samples> hop=<samples> nfft=<pow2> mels=<int> mfcc=<int> feat=<0|1> store=<none|sram|psram> max=<bytes> -> READY ...",
-    "SAVE": "-> TODO in Mission 2 (currently returns ERR SAVE not written yet)",
+    "SAVE": "-> OK SAVE n=<bytes> us=<microseconds> crc=<crc32_hex> (persists storeBuf to LittleFS /rec.bin)",
     "DUMP <sram|psram|flash>": "-> DATA <n> followed by n raw bytes",
     "CRC <sram|psram|flash>": "-> CRC where=<where> n=<bytes> crc=<hex>",
     "FREE": "-> OK FREE"
