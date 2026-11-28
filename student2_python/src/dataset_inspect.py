@@ -124,6 +124,8 @@ def main() -> None:
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
     manifest_path = dataset_dir / "dataset_manifest.csv"
+    if not rows:
+        raise RuntimeError("No clips returned by inspect_dataset()")
     with manifest_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()

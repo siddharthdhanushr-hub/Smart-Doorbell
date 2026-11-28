@@ -20,6 +20,7 @@ from student2_python.preprocessing.audio_codec import (
     sqnr_db,
     unpack,
 )
+from student2_python.transmission.batch_pipeline import transmit_batch, transmit_clip
 from student2_python.transmission.serial_sender import (
     ClipLoader,
     MockBoard,
@@ -85,3 +86,26 @@ def test_clip_loader_team1():
     payload, x = loader.prepare_payload(0, fs=16000, antialias=True, fmt="i16", scale=1.0)
     assert x.shape == (16000,)
     assert len(payload) == 32000
+
+
+def test_batch_pipeline_with_mock_board():
+    class _StubLoader:
+        def clip_list(self):
+            return [(0, "on"), (1, "off")]
+
+        def prepare_payload(self, clip_id, fs=16000, antialias=True, fmt="i16", scale=1.0):
+            x = np.zeros(fs, dtype=np.float32)
+            return pack(x, fmt=fmt, scale=scale), x
+
+    mb = MockBoard()
+    single = transmit_clip(mb, _StubLoader(), clip_id=0, store="psram", feat=True)
+    assert single["payload_bytes"] == 32000
+    assert single["result"]["board"]["frames_ok"] == 51
+
+    batch = transmit_batch(mb, _StubLoader(), clip_ids=[0, 1], store="psram", feat=True)
+    assert batch["num_clips"] == 2
+    assert batch["total_bytes"] == 64000
+    assert len(mb.dump("psram")) == 64000
+
+    with pytest.raises(ValueError):
+        transmit_batch(mb, _StubLoader(), clip_ids=[])

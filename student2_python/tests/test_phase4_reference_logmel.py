@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
@@ -39,3 +40,11 @@ def test_mel_filterbank_htk_bounds():
     assert np.all(fb >= 0.0)
     assert np.all(fb <= 1.0)
     assert np.all(fb.sum(axis=1) > 0.0)
+
+
+def test_features_rejects_invalid_nfft_and_win():
+    x = np.zeros(1600, dtype=np.float32)
+    with pytest.raises(ValueError):
+        features(x, fs=48000, win=1440, hop=960, nfft=256, mels=40)
+    with pytest.raises(ValueError):
+        features(x, fs=16000, win=480, hop=320, nfft=500, mels=40)

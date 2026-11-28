@@ -11,11 +11,11 @@ import sys
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
-from student2_python.preprocessing.audio_codec import pack, unpack
+from student2_python.preprocessing.audio_codec import pack
 
 UP_MAGIC = b"\xA5\x5A"
 DOWN_MAGIC = b"\xB5\x5B"

@@ -5,10 +5,9 @@ Connects ClipLoader + audio_codec + Board/MockBoard with full logging.
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Tuple
 
 import numpy as np
 
@@ -21,13 +20,18 @@ ASSIGNMENT_DIR = resolve_starter_dir(REPO_ROOT)
 if str(ASSIGNMENT_DIR) not in sys.path:
     sys.path.insert(0, str(ASSIGNMENT_DIR))
 
-from student2_python.preprocessing.audio_codec import pack  # type: ignore
-from student2_python.transmission.serial_sender import ClipLoader  # type: ignore
+
+class ClipLoaderProtocol(Protocol):
+    def clip_list(self) -> List[Tuple[int, str]]: ...
+
+    def prepare_payload(
+        self, clip_id: int, fs: int = 16000, antialias: bool = True, fmt: str = "i16", scale: float = 1.0
+    ) -> Tuple[bytes, np.ndarray]: ...
 
 
 def transmit_clip(
     board: Any,
-    loader: ClipLoader,
+    loader: ClipLoaderProtocol,
     clip_id: int,
     fs: int = 16000,
     antialias: bool = True,
@@ -73,7 +77,7 @@ def transmit_clip(
 
 def transmit_batch(
     board: Any,
-    loader: ClipLoader,
+    loader: ClipLoaderProtocol,
     clip_ids: Optional[Iterable[int]] = None,
     fs: int = 16000,
     antialias: bool = True,
@@ -92,6 +96,8 @@ def transmit_batch(
 ) -> Dict[str, Any]:
     clips_map = dict(loader.clip_list())
     ids = list(clip_ids) if clip_ids is not None else list(clips_map.keys())
+    if not ids:
+        raise ValueError("clip_ids must not be empty")
     chunks: List[bytes] = []
     meta: List[Dict[str, Any]] = []
     offset_samples = 0
