@@ -5,8 +5,8 @@ import { LineChart } from '../components/charts/LineChart';
 import { KpiCard } from '../components/ui/KpiCard';
 import { SectionCard } from '../components/ui/SectionCard';
 
-function avg(nums: number[]): number {
-  if (nums.length === 0) return 0;
+function avgNullable(nums: number[]): number | null {
+  if (nums.length === 0) return null;
   return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
@@ -23,9 +23,9 @@ export function CommunicationPage({ bundle }: { bundle: DashboardBundle }) {
       const usbRuns = runs.filter((r) => r.test_group === 'baud_throughput' && r.port_label === 'USB' && r.baud === baud);
       return {
         label: baud === 2000000 ? '2M' : `${(baud / 1000).toFixed(1)}k`,
-        comKbps: avg(comRuns.map((r) => r.throughput_board_bps / 1000)),
-        usbBoardKbps: avg(usbRuns.map((r) => r.throughput_board_bps / 1000)),
-        usbLaptopKbps: avg(usbRuns.map((r) => r.throughput_laptop_bps / 1000)),
+        comKbps: avgNullable(comRuns.map((r) => r.throughput_board_bps / 1000)),
+        usbBoardKbps: avgNullable(usbRuns.map((r) => r.throughput_board_bps / 1000)),
+        usbLaptopKbps: avgNullable(usbRuns.map((r) => r.throughput_laptop_bps / 1000)),
       };
     });
   }, [runs]);
@@ -38,10 +38,10 @@ export function CommunicationPage({ bundle }: { bundle: DashboardBundle }) {
       const usb = runs.filter((r) => r.test_group === 'datatype_speed0' && r.port_label === 'USB' && r.fmt === fmt);
       return {
         fmt,
-        comKbps: avg(com.map((r) => r.throughput_board_bps / 1000)),
-        usbKbps: usb.length ? avg(usb.map((r) => r.throughput_board_bps / 1000)) : null,
-        comSamplesS: avg(com.map((r) => r.effective_samples_per_s)),
-        usbSamplesS: usb.length ? avg(usb.map((r) => r.effective_samples_per_s)) : null,
+        comKbps: avgNullable(com.map((r) => r.throughput_board_bps / 1000)),
+        usbKbps: avgNullable(usb.map((r) => r.throughput_board_bps / 1000)),
+        comSamplesS: avgNullable(com.map((r) => r.effective_samples_per_s)),
+        usbSamplesS: avgNullable(usb.map((r) => r.effective_samples_per_s)),
       };
     });
   }, [runs]);
@@ -52,14 +52,16 @@ export function CommunicationPage({ bundle }: { bundle: DashboardBundle }) {
     const comPts = sizes
       .map((sz) => {
         const subset = runs.filter((r) => r.test_group === 'packet_size' && r.port_label === 'COM' && r.samples_per_packet === sz);
-        return subset.length ? { x: sz, y: avg(subset.map((r) => r.throughput_board_bps / 1000)) } : null;
+        const y = avgNullable(subset.map((r) => r.throughput_board_bps / 1000));
+        return y !== null ? { x: sz, y } : null;
       })
       .filter((p): p is { x: number; y: number } => p !== null);
 
     const usbPts = sizes
       .map((sz) => {
         const subset = runs.filter((r) => r.test_group === 'packet_size' && r.port_label === 'USB' && r.samples_per_packet === sz);
-        return subset.length ? { x: sz, y: avg(subset.map((r) => r.throughput_board_bps / 1000)) } : null;
+        const y = avgNullable(subset.map((r) => r.throughput_board_bps / 1000));
+        return y !== null ? { x: sz, y } : null;
       })
       .filter((p): p is { x: number; y: number } => p !== null);
 
@@ -124,17 +126,17 @@ export function CommunicationPage({ bundle }: { bundle: DashboardBundle }) {
         />
         <KpiCard
           title="USB Throughput (COM11)"
-          value={baudStats[1]?.usbBoardKbps.toFixed(1)}
+          value={baudStats[1]?.usbBoardKbps !== null && baudStats[1]?.usbBoardKbps !== undefined ? baudStats[1].usbBoardKbps.toFixed(1) : null}
           unit="kB/s"
-          subtitle={`Laptop side ~${baudStats[1]?.usbLaptopKbps.toFixed(1)} kB/s · ignores baud`}
+          subtitle={`Laptop side ~${baudStats[1]?.usbLaptopKbps !== null && baudStats[1]?.usbLaptopKbps !== undefined ? baudStats[1].usbLaptopKbps.toFixed(1) : 'N/A'} kB/s · ignores baud`}
           origin="recorded"
           accent="emerald"
         />
         <KpiCard
           title="UART Bridge (COM12 @ 2M)"
-          value={baudStats[2]?.comKbps.toFixed(1)}
+          value={baudStats[2]?.comKbps !== null && baudStats[2]?.comKbps !== undefined ? baudStats[2].comKbps.toFixed(1) : null}
           unit="kB/s"
-          subtitle={`921.6k baud: ${baudStats[1]?.comKbps.toFixed(1)} kB/s · 0 UART errors`}
+          subtitle={`921.6k baud: ${baudStats[1]?.comKbps !== null && baudStats[1]?.comKbps !== undefined ? baudStats[1].comKbps.toFixed(1) : 'N/A'} kB/s · 0 UART errors`}
           origin="recorded"
           accent="cyan"
         />

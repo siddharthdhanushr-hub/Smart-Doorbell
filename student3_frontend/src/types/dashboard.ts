@@ -475,6 +475,7 @@ export interface FeatureSettingMetrics {
   max_abs_db: number;
   per_band_mae_db: number[];
   per_class_mae_db: Record<string, number>;
+  reference_baseline?: string;
 }
 
 export type Student4FeatureComparison = Record<string, FeatureSettingMetrics>;

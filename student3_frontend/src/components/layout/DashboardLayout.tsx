@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   Activity,
   AudioLines,
@@ -60,6 +60,15 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
   const navContent = (
     <nav className="flex flex-col gap-1 p-3">
       <div className="mb-3 px-2 pt-1">
@@ -81,6 +90,7 @@ export function DashboardLayout({
           <button
             key={item.id}
             type="button"
+            aria-current={active ? 'page' : undefined}
             onClick={() => {
               onSelectPage(item.id);
               setMobileOpen(false);

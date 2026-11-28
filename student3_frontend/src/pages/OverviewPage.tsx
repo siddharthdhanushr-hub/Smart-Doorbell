@@ -13,6 +13,11 @@ export function OverviewPage({ bundle, onNavigate }: OverviewPageProps) {
   const mel40 = bundle.mission3.optimized.mel40_10s_realtime;
   const starter = bundle.mission3.starter_10s;
   const speedup = Math.round(starter.compute_us.mean / mel40.compute_us.mean);
+  const dutyCyclePct =
+    primaryRun.compute_us_mean !== null ? ((primaryRun.compute_us_mean / 20000) * 100).toFixed(2) : 'N/A';
+  const cleanFrames = bundle.student4.validationSummary?.dataset.clean_frames ?? 7056;
+  const excludedFrames = bundle.student4.validationSummary?.dataset.excluded_straddling_frames ?? 143;
+  const totalCrcErr = primaryRun.board.bad_crc + primaryRun.bad_crc_back;
 
   const missions = [
     {
@@ -103,7 +108,7 @@ export function OverviewPage({ bundle, onNavigate }: OverviewPageProps) {
           title="Validated Dataset"
           value={`${bundle.dataset.validation.valid_clips} / ${bundle.dataset.validation.total_clips}`}
           unit="clips"
-          subtitle="7,056 clean frames (49/clip × 6 classes; 143 straddling excluded)"
+          subtitle={`${cleanFrames.toLocaleString()} clean frames (49/clip × 6 classes; ${excludedFrames} straddling excluded)`}
           origin="recorded"
           accent="cyan"
           icon={<Database className="h-4 w-4" />}
@@ -112,7 +117,7 @@ export function OverviewPage({ bundle, onNavigate }: OverviewPageProps) {
           title="Shipping Audio Config"
           value="16 kHz · i16"
           unit="S=1.0"
-          subtitle="74.21 dB mean SQNR · 0% clipping · 32,000 B/s uplink"
+          subtitle={`${bundle.mission2.python_audio_analysis.sqnr.all_144_clips_summary['i16_S1.0']?.mean_sqnr_db.toFixed(2) ?? 'N/A'} dB mean SQNR · 0% clipping · 32,000 B/s uplink`}
           origin="recorded"
           accent="emerald"
           icon={<ShieldCheck className="h-4 w-4" />}
@@ -121,7 +126,7 @@ export function OverviewPage({ bundle, onNavigate }: OverviewPageProps) {
           title="ESP32 Compute Latency"
           value={primaryRun.compute_us_mean?.toFixed(2)}
           unit="us/frame"
-          subtitle={`${speedup.toLocaleString()}× faster than starter DFT (3.4% CPU duty cycle)`}
+          subtitle={`${speedup.toLocaleString()}× faster than starter DFT (${dutyCyclePct}% CPU duty cycle)`}
           origin="recorded"
           accent="cyan"
           icon={<Cpu className="h-4 w-4" />}
@@ -130,7 +135,7 @@ export function OverviewPage({ bundle, onNavigate }: OverviewPageProps) {
           title="144-Clip Delivery & Flash CRC"
           value={`${primaryRun.lost_features}`}
           unit="lost pkts"
-          subtitle={`7,200 pkts sent · 0 CRC errors · Flash CRC ${bundle.mission2.verify_power_cut.flash_crc_hex}`}
+          subtitle={`${primaryRun.packets_sent.toLocaleString()} pkts sent · ${totalCrcErr} CRC errors · Flash CRC ${bundle.mission2.verify_power_cut.flash_crc_hex}`}
           origin="recorded"
           accent="emerald"
           icon={<HardDrive className="h-4 w-4" />}

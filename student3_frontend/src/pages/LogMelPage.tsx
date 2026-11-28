@@ -89,7 +89,13 @@ export function LogMelPage({
               ? `RMSE: ${diffStats.rmse.toFixed(6)} dB · Max: ${diffStats.maxAbs.toFixed(5)} dB`
               : 'ESP32 recorded clip array applies to 16 kHz antialias=True'
           }
-          origin={clipDetail?.origin === 'live_api' && clipDetail.esp32_logmel ? 'recorded' : 'mock'}
+          origin={
+            !diffStats
+              ? 'awaiting'
+              : clipDetail?.origin === 'live_api'
+                ? 'recorded'
+                : 'mock'
+          }
           accent="amber"
         />
       </div>
@@ -101,8 +107,9 @@ export function LogMelPage({
         origin={clipDetail?.origin ?? 'mock'}
         headerRight={
           <div className="flex items-center gap-2">
-            <label className="text-xs text-slate-400">Clip #:</label>
+            <label htmlFor="logmel-clip-select" className="text-xs text-slate-400">Clip #:</label>
             <select
+              id="logmel-clip-select"
               value={clipId}
               onChange={(e) => onChangeClip(Number(e.target.value))}
               className="rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-1 font-mono text-xs text-slate-100"

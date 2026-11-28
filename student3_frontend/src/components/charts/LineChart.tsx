@@ -44,18 +44,27 @@ export function LineChart({
   const plotH = height - padTop - padBottom;
 
   const allPts = series.flatMap((s) => s.points);
+  if (allPts.length === 0) {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-lg border border-slate-800 bg-slate-950/60 text-xs text-slate-400">
+        No measured data available for {yLabel}.
+      </div>
+    );
+  }
   const xs = allPts.map((p) => p.x);
   const ys = allPts.map((p) => p.y);
-  const xMin = xs.length ? Math.min(...xs) : 0;
-  const xMax = xs.length ? Math.max(...xs) : 1;
+  const xMin = Math.min(...xs);
+  const xMax = Math.max(...xs);
   const yMin = 0;
-  const yMax = Math.max(1e-6, (ys.length ? Math.max(...ys) : 1) * 1.12);
+  const yMax = Math.max(1e-6, Math.max(...ys) * 1.12);
 
   const mapX = (x: number) =>
     xMax === xMin ? padLeft + plotW / 2 : padLeft + ((x - xMin) / (xMax - xMin)) * plotW;
   const mapY = (y: number) => padTop + plotH - ((y - yMin) / (yMax - yMin)) * plotH;
 
   const uniqueXs = Array.from(new Set(xs)).sort((a, b) => a - b);
+  const tickStep = uniqueXs.length > 10 ? Math.ceil(uniqueXs.length / 8) : 1;
+  const visibleXs = uniqueXs.filter((_, idx) => idx % tickStep === 0 || idx === uniqueXs.length - 1);
 
   return (
     <div className="w-full">
@@ -75,7 +84,12 @@ export function LineChart({
       </div>
 
       <div className="w-full overflow-x-auto">
-        <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full min-w-[460px]">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label={`${yLabel} vs ${xLabel} line chart`}
+          className="h-auto w-full min-w-[460px]"
+        >
           {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
             const y = padTop + plotH * (1 - frac);
             const val = yMin + (yMax - yMin) * frac;
@@ -89,7 +103,7 @@ export function LineChart({
             );
           })}
 
-          {uniqueXs.map((xv) => {
+          {visibleXs.map((xv) => {
             const x = mapX(xv);
             return (
               <g key={xv}>
