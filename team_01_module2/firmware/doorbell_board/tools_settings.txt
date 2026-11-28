@@ -1,0 +1,15 @@
+# ESP32-S3 Arduino IDE Tools Settings — Team 1 Paradise
+
+Board: "ESP32S3 Dev Module"
+USB CDC On Boot: "Enabled"
+Flash Size: "16MB (128Mb)"
+Partition Scheme: "Custom" (uses partitions.csv in sketch directory)
+PSRAM: "OPI PSRAM"
+Upload Speed: "921600"
+USB Mode: "Hardware CDC and JTAG"
+
+arduino-cli FQBN:
+esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=custom,PSRAM=opi
+
+Compilation Command:
+arduino-cli compile --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=custom,PSRAM=opi doorbell_board.ino

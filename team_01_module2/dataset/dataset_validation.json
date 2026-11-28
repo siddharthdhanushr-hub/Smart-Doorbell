@@ -1,0 +1,27 @@
+{
+  "team": 1,
+  "fs": 16000,
+  "antialias": true,
+  "total_clips": 144,
+  "expected_clips": 144,
+  "valid_clips": 144,
+  "invalid_clip_ids": [],
+  "class_distribution": {
+    "on": 24,
+    "off": 24,
+    "stop": 24,
+    "go": 24,
+    "_unknown": 24,
+    "_silence": 24
+  },
+  "duplicate_non_silence_pool_recordings": 0,
+  "team_room_parameters": {
+    "whine": 7347.984106110692,
+    "whine_amp": 0.050502434087888036,
+    "hum": 100.0,
+    "noise": 0.007695184077713923
+  },
+  "speech_pool_total_recordings": 780,
+  "speech_pool_sample_rate": 22050,
+  "speech_pool_dtype": "int16"
+}
