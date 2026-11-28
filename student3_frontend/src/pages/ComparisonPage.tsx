@@ -33,9 +33,9 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
                 <tr className="border-b border-slate-800 text-slate-400">
                   <th className="py-2 pr-3">Setting Tag</th>
                   <th className="py-2 pr-3 font-mono">MAE vs Quant NumPy</th>
-                  <th className="py-2 pr-3 font-mono">MAE vs Orig f32</th>
+                  <th className="py-2 pr-3 font-mono">Recorded MAE (Matched f32)</th>
                   <th className="py-2 pr-3 font-mono">Max Diff (f32)</th>
-                  <th className="py-2 font-mono">RMSE</th>
+                  <th className="py-2 font-mono">Student 4 MAE / RMSE (AA=True Ref)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -45,10 +45,17 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
                     <tr key={r.tag}>
                       <td className="py-2.5 pr-3 font-sans font-medium text-slate-200">{r.tag}</td>
                       <td className="py-2.5 pr-3 text-emerald-300">{r.mae_vs_quantised_numpy_db.toFixed(6)} dB</td>
-                      <td className="py-2.5 pr-3 text-cyan-300">{r.mae_vs_orig_f32_numpy_db.toFixed(6)} dB</td>
+                      <td className="py-2.5 pr-3 text-cyan-300">
+                        {r.mae_vs_orig_f32_numpy_db.toFixed(6)} dB
+                        {r.tag === '8k_i16_S1.0_noaa' && (
+                          <span className="ml-1 font-sans text-[10px] text-slate-400">(vs 8k No-AA)</span>
+                        )}
+                      </td>
                       <td className="py-2.5 pr-3 text-amber-300">{r.max_diff_vs_orig_f32_numpy_db.toFixed(4)} dB</td>
                       <td className="py-2.5 text-slate-300">
-                        {s4Row ? `${s4Row.rmse_db.toFixed(4)} dB` : <span className="text-slate-500">N/A (Student 4)</span>}
+                        {s4Row
+                          ? `${s4Row.mae_db.toFixed(4)} / ${s4Row.rmse_db.toFixed(4)} dB`
+                          : <span className="text-slate-500">N/A (Student 4)</span>}
                       </td>
                     </tr>
                   );

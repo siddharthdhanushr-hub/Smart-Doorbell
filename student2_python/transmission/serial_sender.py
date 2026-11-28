@@ -138,7 +138,9 @@ class MockBoard:
             if rseq <= last_seq:
                 dup += 1
                 continue
-            if last_seq >= 0 and rseq != last_seq + 1:
+            if last_seq < 0 and rseq > 0:
+                seq_gaps += rseq
+            elif last_seq >= 0 and rseq != last_seq + 1:
                 seq_gaps += rseq - last_seq - 1
             last_seq = rseq
             frames_ok += 1
