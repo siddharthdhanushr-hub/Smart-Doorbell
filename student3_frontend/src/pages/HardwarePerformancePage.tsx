@@ -180,11 +180,39 @@ export function HardwarePerformancePage({ bundle }: { bundle: DashboardBundle })
               <p className="font-semibold text-emerald-300">ESP32-S3 Memory & Runtime Footprint</p>
               <div className="mt-2 grid grid-cols-2 gap-2 font-mono text-[11px] text-slate-300">
                 <span>Free internal SRAM: {hw.board_info_measured.mission2_opi_16m.heap_free.toLocaleString()} B</span>
-                <span>Feature extractor heap: ~53,636 B (18.6%)</span>
+                <span>Feature extractor heap: 53,636 B (18.6%)</span>
                 <span>OPI PSRAM free (idle): {hw.board_info_measured.mission2_opi_16m.psram_free.toLocaleString()} B</span>
                 <span>LittleFS used (/rec.bin): {hw.board_info_measured.mission2_opi_16m.fs_used_after_save144.toLocaleString()} B</span>
               </div>
             </div>
+
+            <BarChart
+              categories={['SRAM (Feature Heap)', 'OPI PSRAM (144 Clips)', 'LittleFS (/rec.bin)']}
+              series={[
+                {
+                  name: 'Used / Required',
+                  color: '#22d3ee',
+                  values: [
+                    53636 / 1024,
+                    m2.save144.expected_bytes / 1024,
+                    hw.board_info_measured.mission2_opi_16m.fs_used_after_save144 / 1024,
+                  ],
+                },
+                {
+                  name: 'Total Available',
+                  color: '#334155',
+                  values: [
+                    hw.board_info_measured.mission2_opi_16m.heap_free / 1024,
+                    hw.board_info_measured.mission2_opi_16m.psram_size / 1024,
+                    hw.board_info_measured.mission2_opi_16m.fs_total / 1024,
+                  ],
+                },
+              ]}
+              yLabel="Memory / Storage Size"
+              yUnit="KiB"
+              height={200}
+              valueFormatter={(v) => `${Math.round(v).toLocaleString()}`}
+            />
           </div>
         </SectionCard>
       </div>

@@ -55,6 +55,7 @@ export function MlEvaluationPage({ bundle }: { bundle: DashboardBundle }) {
                 {activeResults.split.random_seed})
               </div>
               <select
+                aria-label="Select classifier evaluation setting"
                 value={selectedEvalIdx}
                 onChange={(e) => setSelectedEvalIdx(Number(e.target.value))}
                 className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-100"

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MOCK_STUDENT4_FEATURE_COMPARISON } from '../data/mock/mockGenerators';
 import type { DashboardBundle, Student4FeatureComparison } from '../types/dashboard';
 import { BarChart } from '../components/charts/BarChart';
+import { LineChart } from '../components/charts/LineChart';
 import { EmptyAwaitingCard } from '../components/ui/EmptyAwaitingCard';
 import { SectionCard } from '../components/ui/SectionCard';
 
@@ -15,7 +16,6 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
 
   const settingKeys = s4Data ? Object.keys(s4Data) : [];
   const firstSetting = settingKeys[0];
-  const bandMae = firstSetting && s4Data ? s4Data[firstSetting].per_band_mae_db : [];
   const classLabels = firstSetting && s4Data ? Object.keys(s4Data[firstSetting].per_class_mae_db) : [];
 
   return (
@@ -113,7 +113,8 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
                     <th className="py-2 pr-3 font-mono">MAE (dB)</th>
                     <th className="py-2 pr-3 font-mono">MSE (dB²)</th>
                     <th className="py-2 pr-3 font-mono">RMSE (dB)</th>
-                    <th className="py-2 font-mono">Max Abs (dB)</th>
+                    <th className="py-2 pr-3 font-mono">Max Abs (dB)</th>
+                    <th className="py-2">Reference Baseline</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -125,7 +126,10 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
                         <td className="py-2.5 pr-3 text-cyan-300">{row.mae_db.toFixed(6)}</td>
                         <td className="py-2.5 pr-3 text-slate-300">{row.mse_db2.toFixed(6)}</td>
                         <td className="py-2.5 pr-3 text-emerald-300">{row.rmse_db.toFixed(6)}</td>
-                        <td className="py-2.5 text-amber-300">{row.max_abs_db.toFixed(4)}</td>
+                        <td className="py-2.5 pr-3 text-amber-300">{row.max_abs_db.toFixed(4)}</td>
+                        <td className="py-2.5 font-sans text-[11px] text-slate-400">
+                          {row.reference_baseline ?? 'N/A'}
+                        </td>
                       </tr>
                     );
                   })}
@@ -146,18 +150,18 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
                 valueFormatter={(v) => v.toFixed(3)}
               />
 
-              <BarChart
-                categories={bandMae.map((_, i) => `B${i}`)}
-                series={settingKeys
-                  .filter((k) => k === '8k_i16_S1.0_noaa' || k === '16k_i8_S1.0')
-                  .map((k, idx) => ({
-                    name: `${k} per-band MAE`,
-                    color: idx === 0 ? '#f43f5e' : '#22d3ee',
-                    values: s4Data[k].per_band_mae_db,
-                  }))}
+              <LineChart
+                series={settingKeys.map((k, idx) => ({
+                  name: k,
+                  color: ['#34d399', '#22d3ee', '#fbbf24', '#f43f5e'][idx % 4],
+                  points: s4Data[k].per_band_mae_db.map((val, bandIdx) => ({ x: bandIdx, y: val })),
+                }))}
+                xLabel="HTK Mel Band"
+                xUnit="index"
                 yLabel="Per-Band MAE"
                 yUnit="dB"
-                valueFormatter={(v) => v.toFixed(2)}
+                xFormatter={(v) => `B${Math.round(v)}`}
+                yFormatter={(v) => v.toFixed(3)}
               />
             </div>
           </div>

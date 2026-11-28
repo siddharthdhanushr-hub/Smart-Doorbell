@@ -4,6 +4,12 @@ import { BarChart } from '../components/charts/BarChart';
 import { KpiCard } from '../components/ui/KpiCard';
 import { SectionCard } from '../components/ui/SectionCard';
 
+function formatNumOrNA(val: string | number | undefined | null, digits: number): string {
+  if (val === undefined || val === null || String(val).trim() === '') return 'N/A';
+  const n = Number(val);
+  return Number.isFinite(n) ? n.toFixed(digits) : 'N/A';
+}
+
 export function DatasetPage({ bundle }: { bundle: DashboardBundle }) {
   const [search, setSearch] = useState('');
   const [classFilter, setClassFilter] = useState('ALL');
@@ -11,6 +17,7 @@ export function DatasetPage({ bundle }: { bundle: DashboardBundle }) {
   const val = bundle.dataset.validation;
   const manifest = bundle.dataset.manifest;
   const classes = Object.keys(val.class_distribution);
+  const s4Dataset = bundle.student4.validationSummary?.dataset;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -33,15 +40,15 @@ export function DatasetPage({ bundle }: { bundle: DashboardBundle }) {
           title="Total Audio Recordings"
           value={val.total_clips}
           unit="clips"
-          subtitle={`${val.valid_clips}/${val.expected_clips} validated · 0 invalid`}
+          subtitle={`${val.valid_clips}/${val.expected_clips} validated · ${val.invalid_clip_ids.length} invalid`}
           origin="recorded"
           accent="cyan"
         />
         <KpiCard
           title="Clean ESP32 Dataset"
-          value="7,056"
+          value={(s4Dataset?.clean_frames ?? 7056).toLocaleString()}
           unit="frames"
-          subtitle="49 frames/clip × 144 clips (143 straddling frames excluded)"
+          subtitle={`49 frames/clip × ${val.total_clips} clips (${s4Dataset?.excluded_straddling_frames ?? 143} straddling frames excluded)`}
           origin="recorded"
           accent="emerald"
         />
@@ -103,6 +110,7 @@ export function DatasetPage({ bundle }: { bundle: DashboardBundle }) {
         headerRight={
           <div className="flex flex-wrap items-center gap-2">
             <select
+              aria-label="Filter manifest by class"
               value={classFilter}
               onChange={(e) => setClassFilter(e.target.value)}
               className="rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-1 text-xs text-slate-100"
@@ -116,6 +124,7 @@ export function DatasetPage({ bundle }: { bundle: DashboardBundle }) {
             </select>
             <input
               type="text"
+              aria-label="Search manifest by clip ID or voice"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search clip ID or voice..."
@@ -144,8 +153,8 @@ export function DatasetPage({ bundle }: { bundle: DashboardBundle }) {
                   <td className="py-1.5 pr-3 font-medium text-slate-100">{r.label}</td>
                   <td className="py-1.5 pr-3 font-mono text-slate-300">{r.pool_word}</td>
                   <td className="py-1.5 pr-3 text-slate-400">{r.pool_voice}</td>
-                  <td className="py-1.5 pr-3 font-mono text-slate-300">{Number(r.peak_abs).toFixed(4)}</td>
-                  <td className="py-1.5 pr-3 font-mono text-slate-300">{Number(r.rms).toFixed(4)}</td>
+                  <td className="py-1.5 pr-3 font-mono text-slate-300">{formatNumOrNA(r.peak_abs, 4)}</td>
+                  <td className="py-1.5 pr-3 font-mono text-slate-300">{formatNumOrNA(r.rms, 4)}</td>
                   <td className="py-1.5 text-emerald-300">{r.valid}</td>
                 </tr>
               ))}

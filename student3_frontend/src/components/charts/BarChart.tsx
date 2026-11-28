@@ -29,11 +29,19 @@ export function BarChart({
   const padLeft = 64;
   const padRight = 18;
   const padTop = 20;
-  const padBottom = 46;
+  const hasLongLabels = categories.some((c) => c.length > 12) || categories.length > 6;
+  const padBottom = hasLongLabels ? 68 : 46;
   const plotW = width - padLeft - padRight;
   const plotH = height - padTop - padBottom;
 
   const allVals = series.flatMap((s) => s.values.filter((v): v is number => v !== null && Number.isFinite(v)));
+  if (allVals.length === 0 || categories.length === 0) {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-lg border border-slate-800 bg-slate-950/60 text-xs text-slate-400">
+        No measured data available for {yLabel}.
+      </div>
+    );
+  }
   const maxVal = Math.max(1e-6, ...allVals);
   const yMax = maxVal * 1.12;
   const ticks = 5;
@@ -61,7 +69,12 @@ export function BarChart({
       </div>
 
       <div className="relative w-full overflow-x-auto">
-        <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full min-w-[460px]">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label={`${yLabel} bar chart`}
+          className="h-auto w-full min-w-[460px]"
+        >
           {/* Gridlines & Y-ticks */}
           {Array.from({ length: ticks + 1 }, (_, i) => {
             const frac = i / ticks;
@@ -113,12 +126,17 @@ export function BarChart({
                 })}
                 <text
                   x={padLeft + ci * groupW + groupW / 2}
-                  y={padTop + plotH + 16}
-                  textAnchor="middle"
+                  y={padTop + plotH + (hasLongLabels ? 14 : 16)}
+                  textAnchor={hasLongLabels ? 'end' : 'middle'}
+                  transform={
+                    hasLongLabels
+                      ? `rotate(-20 ${padLeft + ci * groupW + groupW / 2} ${padTop + plotH + 14})`
+                      : undefined
+                  }
                   fill="#cbd5e1"
                   fontSize="10"
                 >
-                  {cat}
+                  {cat.length > 22 ? `${cat.slice(0, 20)}…` : cat}
                 </text>
               </g>
             );

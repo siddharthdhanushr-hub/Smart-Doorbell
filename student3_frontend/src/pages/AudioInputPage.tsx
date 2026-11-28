@@ -56,8 +56,9 @@ export function AudioInputPage({
       >
         <div className="grid gap-4 md:grid-cols-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">Filter by Class</label>
+            <label htmlFor="audio-class-select" className="mb-1 block text-xs font-medium text-slate-400">Filter by Class</label>
             <select
+              id="audio-class-select"
               value={selectedRow?.label ?? 'on'}
               onChange={(e) => {
                 const firstInClass = manifest.find((r) => r.label === e.target.value);
@@ -74,8 +75,9 @@ export function AudioInputPage({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">Clip ID (0..143)</label>
+            <label htmlFor="audio-clip-select" className="mb-1 block text-xs font-medium text-slate-400">Clip ID (0..143)</label>
             <select
+              id="audio-clip-select"
               value={clipId}
               onChange={(e) => onChangeClip(Number(e.target.value))}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-slate-100"
@@ -89,13 +91,14 @@ export function AudioInputPage({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">Sampling Rate (Hz)</label>
+            <label htmlFor="audio-fs-select" className="mb-1 block text-xs font-medium text-slate-400">Sampling Rate (Hz)</label>
             <select
+              id="audio-fs-select"
               value={fs}
               onChange={(e) => onChangeFs(Number(e.target.value))}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-slate-100"
             >
-              {[16000, 8000, 48000, 24000, 12000].map((rate) => (
+              {bundle.configs.audio.allowed_fs_hz.map((rate) => (
                 <option key={rate} value={rate}>
                   {rate.toLocaleString()} Hz
                 </option>
@@ -104,9 +107,10 @@ export function AudioInputPage({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">Anti-Alias Low-Pass Filter</label>
+            <span className="mb-1 block text-xs font-medium text-slate-400">Anti-Alias Low-Pass Filter</span>
             <button
               type="button"
+              aria-pressed={antialias}
               onClick={() => onChangeAntialias(!antialias)}
               className={`w-full rounded-lg border px-3 py-2 text-xs font-medium ${
                 antialias
