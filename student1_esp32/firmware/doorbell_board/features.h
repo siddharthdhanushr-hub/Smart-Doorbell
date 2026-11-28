@@ -26,7 +26,7 @@ class FeaturePipeline {
   bool begin(const FeatCfg &cfg) {
     end();
     c = cfg;
-    if (c.nfft < 16 || c.nfft > 2048 || (c.nfft & (c.nfft - 1)) || c.win > c.nfft || c.win < 2 ||
+    if (c.fs <= 40 || c.nfft < 16 || c.nfft > 2048 || (c.nfft & (c.nfft - 1)) || c.win > c.nfft || c.win < 2 ||
         c.hop < 1 || c.mels < 1 || c.mels > 128 || c.mfcc < 0 || c.mfcc > c.mels) return false;
     nb = c.nfft / 2 + 1;
     log2n = 0;
