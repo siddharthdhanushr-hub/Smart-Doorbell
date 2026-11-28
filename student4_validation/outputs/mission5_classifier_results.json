@@ -3,7 +3,23 @@
     "method": "stratified_clip_level",
     "train_clips": 96,
     "test_clips": 48,
-    "random_seed": 42
+    "random_seed": 42,
+    "train_class_distribution": {
+      "on": 16,
+      "off": 16,
+      "stop": 16,
+      "go": 16,
+      "_unknown": 16,
+      "_silence": 16
+    },
+    "test_class_distribution": {
+      "on": 8,
+      "off": 8,
+      "stop": 8,
+      "go": 8,
+      "_unknown": 8,
+      "_silence": 8
+    }
   },
   "classes": [
     "on",

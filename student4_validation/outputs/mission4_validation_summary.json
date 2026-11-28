@@ -3,6 +3,8 @@
     "total_clips": 144,
     "valid_clips": 144,
     "invalid_clips": 0,
+    "clipped_clips": 0,
+    "metadata_errors": 0,
     "duplicate_non_silence_pool_recordings": 0,
     "class_clip_counts": {
       "on": 24,
@@ -26,8 +28,11 @@
     "packets_sent": 7200,
     "frames_ok": 7201,
     "seq_gaps": 0,
+    "dup": 0,
     "bad_crc": 0,
-    "lost_features": 0
+    "bad_crc_back": 0,
+    "lost_features": 0,
+    "all_4_runs_zero_packet_loss": true
   },
   "controlled_skip_test": {
     "skip_packets": [
@@ -35,6 +40,19 @@
       11,
       200
     ],
+    "expected_total_packets": 500,
+    "before_fix_packets_sent": 497,
+    "after_fix_packets_sent": 497,
+    "before_fix_packet_loss_pct": 0.6,
+    "after_fix_packet_loss_pct": 0.6,
+    "before_fix_feature_loss_pct": 0.601,
+    "after_fix_feature_loss_pct": 1.002,
+    "before_fix_seq_gaps": 3,
+    "after_fix_seq_gaps": 3,
+    "before_fix_dup": 0,
+    "after_fix_dup": 0,
+    "before_fix_bad_crc": 0,
+    "after_fix_bad_crc": 0,
     "before_fix_samples_rx": 159040,
     "after_fix_samples_rx": 160000,
     "before_fix_received_features": 496,

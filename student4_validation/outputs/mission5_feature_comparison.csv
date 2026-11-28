@@ -1,0 +1,5 @@
+setting,mae_db,mse_db2,rmse_db,max_abs_db,quantised_mae_db,quantised_rmse_db,reference_baseline
+16k_i16_S1.0_speed1,0.003914,3.7e-05,0.006064,0.124218,2e-06,3e-06,16 kHz filtered (antialias=True) Python float32 reference
+16k_i8_S1.0,1.089735,2.530749,1.590833,16.42551,2e-06,3e-06,16 kHz filtered (antialias=True) Python float32 reference
+16k_i8_S0.25,0.821018,6.509584,2.551389,34.247005,1e-06,2e-06,16 kHz filtered (antialias=True) Python float32 reference
+8k_i16_S1.0_noaa,0.002828,1.9e-05,0.004357,0.076488,2e-06,3e-06,8 kHz unfiltered (antialias=False) Python float32 reference (speech_pool.npz absent)
