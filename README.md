@@ -444,7 +444,7 @@ team_01_module2.zip                              # 4,695,348 bytes (~4.7 MB arch
 - Arduino IDE 2.x or `arduino-cli` with `esp32:esp32` core installed
 - Physical ESP32-S3-DevKitC-1 N16R8 connected via USB (optional for board-free software runs)
 
-### 1. Launch the Full-Stack Web Dashboard
+### 1. Launch the Full-Stack Web Dashboard (Local Windows / Mac / Linux)
 To view and interact with the complete project telemetry in your web browser:
 
 ```powershell
@@ -457,6 +457,25 @@ npm install
 npm run dev -- --host 127.0.0.1 --port 5173
 ```
 *Open your browser and navigate to:* **`http://localhost:5173/`**
+
+### 1.1 Launch in GitHub Codespaces (Browser / Cloud VM)
+When running inside a **GitHub Codespaces** terminal (Linux bash):
+
+```bash
+# 1. Install Python dependencies (from repo root)
+pip install -r student2_python/requirements.txt
+
+# 2. Install frontend dependencies
+cd student3_frontend && npm install && cd ..
+
+# 3. Start the Flask Backend in the background
+python3 student2_python/api/server.py --host 127.0.0.1 --port 5000 &
+
+# 4. Start the React Vite Dashboard (binds to 0.0.0.0 for Codespaces port forwarding)
+cd student3_frontend
+npm run dev -- --host 0.0.0.0 --port 5173
+```
+*Codespaces will automatically detect port **5173** and show a pop-up toast: **"Your application running on port 5173 is available. Open in Browser"**. Alternatively, switch to the **PORTS** tab at the bottom and click the globe icon next to port **5173**.*
 
 ### 2. Run All Automated Python Tests
 ```powershell
