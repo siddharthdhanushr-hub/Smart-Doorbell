@@ -98,7 +98,7 @@ export function ComparisonPage({ bundle }: { bundle: DashboardBundle }) {
         {!s4Data ? (
           <EmptyAwaitingCard
             title="Awaiting Student 4 Feature Comparison Output"
-            description="Student 4 will publish full MAE, MSE, RMSE, per-band (40), per-class (6), and 8 kHz antialias=True baseline comparisons into student4_validation/outputs/. Missing metrics are never shown as zero."
+            description="Start the Vite dev server (npm run dev) so the /repo/ static bridge serves student4_validation/outputs/mission5_feature_comparison.json (MAE, MSE, RMSE, per-band, per-class, and 8 kHz antialias=True baseline comparisons). Missing metrics are never shown as zero."
             expectedFiles={['student4_validation/outputs/mission5_feature_comparison.json']}
             actionLabel="Preview Mock Layout"
             onAction={() => setPreviewMock(true)}

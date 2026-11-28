@@ -40,7 +40,7 @@ export function MlEvaluationPage({ bundle }: { bundle: DashboardBundle }) {
         {!activeResults ? (
           <EmptyAwaitingCard
             title="Awaiting Student 4 ML Evaluation Results"
-            description="Student 4 has not yet committed mission5_classifier_results.json into student4_validation/outputs/. Per dashboard integrity rules, missing accuracy, precision, recall, F1, and confusion-matrix entries are never fabricated or shown as zero. You can preview the interactive layout using clearly badged simulated mock data."
+            description="Could not load student4_validation/outputs/mission5_classifier_results.json over the Vite /repo/ bridge (start npm run dev to enable /repo/* file serving). Per dashboard integrity rules, missing metrics are never fabricated or shown as zero unless you enable the simulated mock preview."
             expectedFiles={['student4_validation/outputs/mission5_classifier_results.json']}
             actionLabel="Preview Mock ML Results"
             onAction={() => setPreviewMock(true)}
