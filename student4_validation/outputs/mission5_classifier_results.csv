@@ -1,0 +1,6 @@
+setting,accuracy,precision_macro,recall_macro,f1_macro
+"Laptop float32 (16 kHz, AA=True)",0.75,0.7495,0.75,0.7356
+ESP32 16k int16 S=1.0,0.75,0.7495,0.75,0.7356
+ESP32 16k int8 S=1.0,0.6875,0.6968,0.6875,0.6532
+ESP32 16k int8 S=0.25,0.6667,0.6462,0.6667,0.6289
+ESP32 8k int16 S=1.0 (No AA vs 8k Ref),0.625,0.6492,0.625,0.6137

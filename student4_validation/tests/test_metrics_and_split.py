@@ -12,6 +12,11 @@ from student4_validation.src.nearest_centroid_eval import (
     fit_nearest_centroid,
     make_clip_split,
 )
+from student4_validation.src.validate_dataset_and_packets import (
+    analyze_port_limits,
+    analyze_skip_experiment,
+    audit_dataset,
+)
 
 
 def test_compute_error_metrics_exact_known_arrays() -> None:
@@ -84,3 +89,27 @@ def test_nearest_centroid_separable_clusters() -> None:
     assert ev["accuracy"] == pytest.approx(1.0)
     assert ev["f1_macro"] == pytest.approx(1.0)
     assert np.sum(ev["confusion_matrix"]) == 48
+
+
+def test_split_reproducibility_and_real_logs_integrity() -> None:
+    labels = np.array([cls for cls in CLASSES for _ in range(24)])
+    tr1, te1 = make_clip_split(labels, test_size=1.0 / 3.0, seed=42)
+    tr2, te2 = make_clip_split(labels, test_size=1.0 / 3.0, seed=42)
+    assert np.array_equal(tr1, tr2)
+    assert np.array_equal(te1, te2)
+
+    ds = audit_dataset()
+    assert ds["valid_clips"] == 144
+    assert ds["clipped_clips"] == 0
+    assert ds["metadata_errors"] == 0
+    assert ds["all_4_runs_zero_packet_loss"] is True
+
+    skip = analyze_skip_experiment()
+    assert skip["before_fix_packet_loss_pct"] == pytest.approx(0.6, abs=1e-3)
+    assert skip["after_fix_seq_gaps"] == 3
+    assert skip["after_fix_samples_rx"] == 160000
+
+    ports = analyze_port_limits()
+    assert ports["usb_com11_max_zero_loss_speed"] == pytest.approx(6.0)
+    assert ports["com12_921600_max_lag_free_speed"] == pytest.approx(2.5)
+    assert ports["com12_2000000_max_lag_free_speed"] == pytest.approx(6.0)

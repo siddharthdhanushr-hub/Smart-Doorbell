@@ -23,6 +23,7 @@ Outputs:
 
 from __future__ import annotations
 
+import csv
 import json
 import sys
 from pathlib import Path
@@ -181,25 +182,32 @@ def main() -> None:
     mean_abs_heatmaps: List[Tuple[str, np.ndarray]] = []
 
     for tag, esp_rel, py_rel in SETTINGS:
-        esp_d = np.load(REPO_ROOT / esp_rel)
-        py_d = np.load(REPO_ROOT / py_rel)
+        esp_path = REPO_ROOT / esp_rel
+        py_path = REPO_ROOT / py_rel
+        if not esp_path.exists() or not py_path.exists():
+            raise FileNotFoundError(f"Missing feature array for {tag}: {esp_path} / {py_path}")
 
-        esp_feat = esp_d["features"]
-        labels = esp_d["labels"]
-        assert np.array_equal(esp_d["clip_ids"], py_d["clip_ids"]), f"clip_id mismatch in {tag}"
+        with np.load(esp_path) as esp_d, np.load(py_path) as py_d:
+            esp_feat = esp_d["features"]
+            labels = esp_d["labels"]
+            assert esp_feat.shape == (144, 49, 40), f"Unexpected shape in {tag}: {esp_feat.shape}"
+            assert np.array_equal(esp_d["clip_ids"], py_d["clip_ids"]), f"clip_id mismatch in {tag}"
+            assert np.array_equal(labels, py_d["labels"]), f"label mismatch in {tag}"
+            py_orig_f32 = py_d["features_orig_f32"]
+            py_quantised = py_d["features_quantised"]
 
         if tag == "8k_i16_S1.0_noaa" and f8_aa_ref is not None:
             ref_orig = f8_aa_ref
             baseline_note = "8 kHz filtered (antialias=True) Python float32 reference"
         elif tag == "8k_i16_S1.0_noaa":
-            ref_orig = py_d["features_orig_f32"]
+            ref_orig = py_orig_f32
             baseline_note = "8 kHz unfiltered (antialias=False) Python float32 reference (speech_pool.npz absent)"
         else:
-            ref_orig = py_d["features_orig_f32"]
+            ref_orig = py_orig_f32
             baseline_note = "16 kHz filtered (antialias=True) Python float32 reference"
 
         metrics = compute_error_metrics(esp_feat, ref_orig, labels)
-        quant_metrics = compute_error_metrics(esp_feat, py_d["features_quantised"], labels)
+        quant_metrics = compute_error_metrics(esp_feat, py_quantised, labels)
         metrics["vs_quantised_numpy"] = {
             "mae_db": quant_metrics["mae_db"],
             "mse_db2": quant_metrics["mse_db2"],
@@ -218,7 +226,22 @@ def main() -> None:
 
     out_path = out_dir / "mission5_feature_comparison.json"
     out_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
-    print(f"Wrote {out_path}")
+
+    csv_path = out_dir / "mission5_feature_comparison.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "setting", "mae_db", "mse_db2", "rmse_db", "max_abs_db",
+            "quantised_mae_db", "quantised_rmse_db", "reference_baseline",
+        ])
+        for tag, m in results.items():
+            q = m["vs_quantised_numpy"]
+            writer.writerow([
+                tag, m["mae_db"], m["mse_db2"], m["rmse_db"], m["max_abs_db"],
+                q["mae_db"], q["rmse_db"], m["reference_baseline"],
+            ])
+
+    print(f"Wrote {out_path} and {csv_path}")
 
 
 if __name__ == "__main__":

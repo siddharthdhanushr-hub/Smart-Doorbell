@@ -30,11 +30,16 @@ CLASSES = ["on", "off", "stop", "go", "_unknown", "_silence"]
 
 
 def load_json(rel_path: str) -> Any:
-    return json.loads((REPO_ROOT / rel_path).read_text(encoding="utf-8"))
+    path = REPO_ROOT / rel_path
+    if not path.exists():
+        raise FileNotFoundError(f"Required input file missing: {path}")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def audit_dataset() -> Dict[str, Any]:
     manifest_path = REPO_ROOT / "dataset" / "dataset_manifest.csv"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"Required dataset manifest missing: {manifest_path}")
     with manifest_path.open("r", newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
@@ -44,23 +49,40 @@ def audit_dataset() -> Dict[str, Any]:
 
     class_counts: Dict[str, int] = {c: 0 for c in CLASSES}
     invalid_count = 0
+    clipped_count = 0
+    metadata_errors = 0
     non_silence_pool_indices: List[int] = []
     for r in rows:
-        class_counts[r["label"]] = class_counts.get(r["label"], 0) + 1
+        lbl = r["label"]
+        if lbl not in CLASSES:
+            metadata_errors += 1
+        class_counts[lbl] = class_counts.get(lbl, 0) + 1
         if str(r["valid"]).lower() != "true":
             invalid_count += 1
-        if r["label"] != "_silence":
+        if str(r["clipped"]).lower() == "true":
+            clipped_count += 1
+        if int(r["sample_rate"]) != 16000 or int(r["num_channels"]) != 1 or int(r["sample_count"]) != 16000:
+            metadata_errors += 1
+        if lbl != "_silence":
             non_silence_pool_indices.append(int(r["pool_index"]))
 
+    assert metadata_errors == 0, f"Detected {metadata_errors} metadata mismatches in manifest"
     duplicate_pool = len(non_silence_pool_indices) - len(set(non_silence_pool_indices))
 
+    val_json = load_json("dataset/dataset_validation.json")
+    assert int(val_json["valid_clips"]) == len(rows) - invalid_count
+
     npz_path = REPO_ROOT / "dataset" / "doorbell_team1_esp32_features.npz"
-    d = np.load(npz_path)
-    features = d["features"]
-    npz_clip_ids = d["clip_id"]
-    npz_labels = d["label"]
-    assert features.shape == (7056, 40), f"Unexpected dataset shape: {features.shape}"
-    assert np.all(np.isfinite(features)), "Dataset features contain non-finite values"
+    if not npz_path.exists():
+        raise FileNotFoundError(f"Required dataset NPZ missing: {npz_path}")
+    with np.load(npz_path) as d:
+        features = d["features"]
+        npz_clip_ids = d["clip_id"]
+        npz_labels = d["label"]
+        first_samples = d["first_sample"]
+        assert features.shape == (7056, 40), f"Unexpected dataset shape: {features.shape}"
+        assert np.all(np.isfinite(features)), "Dataset features contain non-finite values"
+        assert int(np.max(first_samples % 16000)) <= 15360, "Straddling frame found in clean dataset"
 
     frames_per_class = {
         c: int(np.sum(npz_labels == c)) for c in CLASSES
@@ -71,11 +93,21 @@ def audit_dataset() -> Dict[str, Any]:
     all_runs = load_json("student1_esp32/logs/phase5_144clips_all_runs.json")["runs"]
     primary_run = next(r for r in all_runs if r["tag"] == "16k_i16_S1.0_speed1")
     excluded_straddling = int(primary_run["dataset"]["straddling_frames_excluded"])
+    all_runs_zero_errors = all(
+        int(r["board"]["seq_gaps"]) == 0
+        and int(r["board"]["bad_crc"]) == 0
+        and int(r["board"]["dup"]) == 0
+        and int(r["lost_features"]) == 0
+        and int(r["bad_crc_back"]) == 0
+        for r in all_runs
+    )
 
     return {
         "total_clips": len(rows),
         "valid_clips": len(rows) - invalid_count,
         "invalid_clips": invalid_count,
+        "clipped_clips": clipped_count,
+        "metadata_errors": metadata_errors,
         "duplicate_non_silence_pool_recordings": duplicate_pool,
         "class_clip_counts": class_counts,
         "clean_frames": int(features.shape[0]),
@@ -85,8 +117,11 @@ def audit_dataset() -> Dict[str, Any]:
         "packets_sent": int(primary_run["packets_sent"]),
         "frames_ok": int(primary_run["board"]["frames_ok"]),
         "seq_gaps": int(primary_run["board"]["seq_gaps"]),
+        "dup": int(primary_run["board"]["dup"]),
         "bad_crc": int(primary_run["board"]["bad_crc"]),
+        "bad_crc_back": int(primary_run["bad_crc_back"]),
         "lost_features": int(primary_run["lost_features"]),
+        "all_4_runs_zero_packet_loss": all_runs_zero_errors,
     }
 
 
@@ -94,8 +129,28 @@ def analyze_skip_experiment() -> Dict[str, Any]:
     before = load_json("student1_esp32/logs/mission4_skip_before_fix.json")
     after = load_json("student1_esp32/logs/mission4_skip_after_fix.json")
 
+    exp_pkts = int(before["expected_total_packets"])
+    before_pkt_loss_pct = round((exp_pkts - int(before["packets_sent"])) / exp_pkts * 100.0, 3)
+    after_pkt_loss_pct = round((exp_pkts - int(after["packets_sent"])) / exp_pkts * 100.0, 3)
+    exp_feat = int(before["expected_features_no_loss"])
+    before_feat_loss_pct = round(int(before["lost_features"]) / exp_feat * 100.0, 3)
+    after_feat_loss_pct = round(int(after["lost_features"]) / exp_feat * 100.0, 3)
+
     return {
         "skip_packets": before["skip_packets"],
+        "expected_total_packets": exp_pkts,
+        "before_fix_packets_sent": int(before["packets_sent"]),
+        "after_fix_packets_sent": int(after["packets_sent"]),
+        "before_fix_packet_loss_pct": before_pkt_loss_pct,
+        "after_fix_packet_loss_pct": after_pkt_loss_pct,
+        "before_fix_feature_loss_pct": before_feat_loss_pct,
+        "after_fix_feature_loss_pct": after_feat_loss_pct,
+        "before_fix_seq_gaps": int(before["board"]["seq_gaps"]),
+        "after_fix_seq_gaps": int(after["board"]["seq_gaps"]),
+        "before_fix_dup": int(before["board"]["dup"]),
+        "after_fix_dup": int(after["board"]["dup"]),
+        "before_fix_bad_crc": int(before["board"]["bad_crc"]),
+        "after_fix_bad_crc": int(after["board"]["bad_crc"]),
         "before_fix_samples_rx": int(before["board"]["samples"]),
         "after_fix_samples_rx": int(after["board"]["samples"]),
         "before_fix_received_features": int(before["received_features"]),
@@ -197,11 +252,13 @@ def save_plots(skip_info: Dict[str, Any], port_info: Dict[str, Any], plot_dir: P
     plt.close(fig)
 
     # Plot 2: Controlled skip before vs after fix
+    # Aligned last frame index for 160,000 samples (win=480, hop=320): ((160000 - 480) // 320) * 320 = 159,360
+    aligned_last_first_sample = ((160000 - 480) // 320) * 320
     fig, ax = plt.subplots(figsize=(7.5, 4.2))
     labels = ["Before Fix\n(No Gap Fill)", "After Fix\n(Gap-Aligned)"]
     tail_offsets = [
-        abs(skip_info["expected_last_first_sample"] - 160 - skip_info["before_fix_last_first_sample"]),
-        abs(skip_info["expected_last_first_sample"] - 160 - skip_info["after_fix_last_first_sample"]),
+        abs(aligned_last_first_sample - skip_info["before_fix_last_first_sample"]),
+        abs(aligned_last_first_sample - skip_info["after_fix_last_first_sample"]),
     ]
     bars = ax.bar(labels, tail_offsets, color=["#e11d48", "#10b981"], width=0.5)
     for b, val in zip(bars, tail_offsets):
